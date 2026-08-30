@@ -1,0 +1,401 @@
+<title>Claude Backend Scorecard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+
+<style>
+  :root {
+    --ground:#F1F4F7; --surface:#FFFFFF; --sunk:#E8EDF2; --ink:#131B23;
+    --muted:#5A6773; --rule:#D7DFE6; --accent:#1F5F8B; --spend:#A85B27; --saved:#226F5E;
+    --shadow:0 1px 2px rgba(19,27,35,.06), 0 8px 24px -14px rgba(19,27,35,.22);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:#0E141A; --surface:#161E26; --sunk:#1D262F; --ink:#E2E9EF;
+      --muted:#96A3B0; --rule:#27333E; --accent:#62AEDF; --spend:#DE9059; --saved:#57BCA1;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -16px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:#0E141A; --surface:#161E26; --sunk:#1D262F; --ink:#E2E9EF;
+    --muted:#96A3B0; --rule:#27333E; --accent:#62AEDF; --spend:#DE9059; --saved:#57BCA1;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -16px rgba(0,0,0,.7);
+  }
+  *{box-sizing:border-box}
+  body{background:var(--ground);color:var(--ink);margin:0;
+    font-family:"Source Sans 3",ui-sans-serif,system-ui,sans-serif;font-size:16px;line-height:1.55;
+    -webkit-font-smoothing:antialiased}
+  .page{max-width:1060px;margin:0 auto;padding:0 24px 72px}
+
+  header.top{padding:56px 0 28px;border-bottom:2px solid var(--ink)}
+  .kicker{font-family:"JetBrains Mono",monospace;font-size:11.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--accent);margin:0 0 16px}
+  h1{font-family:Archivo,sans-serif;font-weight:700;font-size:clamp(2rem,5vw,3.1rem);
+    line-height:1.04;letter-spacing:-.03em;margin:0 0 14px;text-wrap:balance}
+  .sub{font-size:clamp(1rem,2vw,1.15rem);color:var(--muted);max-width:62ch;margin:0 0 22px}
+  .sub strong{color:var(--ink);font-weight:600}
+  .meta{display:flex;flex-wrap:wrap;gap:8px 26px;font-family:"JetBrains Mono",monospace;
+    font-size:11.5px;color:var(--muted)}
+  .meta b{color:var(--ink);font-weight:500}
+
+  .grade{display:inline-flex;align-items:center;gap:7px;font-family:"JetBrains Mono",monospace;
+    font-size:10.5px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;
+    padding:4px 9px;border-radius:3px;border:1px solid;white-space:nowrap}
+  .grade::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;flex:none}
+  .grade.exact{color:var(--saved);border-color:color-mix(in srgb,var(--saved) 42%,transparent)}
+  .grade.warn{color:var(--spend);border-color:color-mix(in srgb,var(--spend) 42%,transparent)}
+
+  section{padding:40px 0 4px;border-bottom:1px solid var(--rule)}
+  section:last-of-type{border-bottom:none}
+  h2{font-family:Archivo,sans-serif;font-weight:600;font-size:clamp(1.3rem,2.8vw,1.75rem);
+    line-height:1.15;letter-spacing:-.02em;margin:0 0 14px;text-wrap:balance;max-width:26ch}
+  p{margin:0 0 16px;max-width:68ch}
+  .note{font-size:13.5px;color:var(--muted);margin:12px 0 0;max-width:74ch}
+  code{font-family:"JetBrains Mono",monospace;font-size:.86em;background:var(--sunk);
+    padding:1px 5px;border-radius:3px}
+
+  .strip{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));margin:22px 0 4px}
+  .stat{background:var(--surface);border:1px solid var(--rule);border-radius:6px;
+    padding:15px 16px;box-shadow:var(--shadow)}
+  .stat .n{font-family:"JetBrains Mono",monospace;font-size:1.75rem;font-weight:700;
+    letter-spacing:-.02em;display:block;line-height:1.1}
+  .stat .l{font-size:12.5px;color:var(--muted);display:block;margin-top:5px}
+
+  .card{background:var(--surface);border:1px solid var(--rule);border-radius:6px;
+    box-shadow:var(--shadow);margin:22px 0;overflow:hidden}
+  .card > header{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:11px 17px;
+    border-bottom:1px solid var(--rule);background:var(--sunk)}
+  .card > header .what{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--muted)}
+  .card .body{padding:17px}
+  .scroll{overflow-x:auto}
+
+  table{border-collapse:collapse;width:100%;min-width:560px;font-variant-numeric:tabular-nums;font-size:14px}
+  th,td{padding:8px 13px;text-align:right;border-bottom:1px solid var(--rule)}
+  th:first-child,td:first-child{text-align:left}
+  thead th{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.09em;
+    text-transform:uppercase;color:var(--muted);font-weight:500;border-bottom:1px solid var(--ink)}
+  tbody tr:last-child td{border-bottom:none}
+  td.n{font-family:"JetBrains Mono",monospace}
+  tr.hl td{background:color-mix(in srgb,var(--accent) 9%,transparent)}
+  tr.dim td{color:var(--muted)}
+  .up{color:var(--saved);font-weight:600}
+  .down{color:var(--spend);font-weight:600}
+
+  .bar{display:block;height:9px;border-radius:2px;background:var(--accent);opacity:.85}
+  .bar.slow{background:var(--spend)}
+  .bar.fast{background:var(--saved)}
+  .barcell{min-width:190px}
+
+  .takeaway{border-left:3px solid var(--accent);padding:3px 0 3px 17px;margin:22px 0 6px;max-width:72ch}
+  .takeaway p{margin:0;font-size:1.02rem}
+  .callout{background:var(--sunk);border:1px solid var(--rule);border-left:3px solid var(--spend);
+    border-radius:4px;padding:15px 17px;margin:22px 0;max-width:74ch}
+  .callout p:last-child{margin-bottom:0}
+  footer{padding:34px 0 0;margin-top:30px;border-top:2px solid var(--ink);
+    font-size:13.5px;color:var(--muted)}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  @media (max-width:640px){.page{padding:0 17px 56px}header.top{padding:40px 0 24px}}
+</style>
+
+<div class="page">
+
+  <header class="top">
+    <p class="kicker">Claude backend &middot; measured, not modelled</p>
+    <h1>Haiku 4.5 vs Opus 5: what the numbers actually say</h1>
+    <p class="sub">
+      Seven dispatch strategies over the same 36-task workload, every call charged to the
+      strategy that made it. <strong>Cost and latency are measured precisely. Accuracy is
+      not</strong> &mdash; and the gap between those two facts is the whole result.
+    </p>
+    <div class="meta">
+      <span><b>Run</b> live, <code>--mode record</code></span>
+      <span><b>Calls</b> 555</span>
+      <span><b>Spend</b> $0.2572</span>
+      <span><b>Tasks</b> 36 (12 easy / 12 medium / 12 hard)</span>
+      <span><b>Models</b> claude-haiku-4-5 · claude-opus-5</span>
+    </div>
+  </header>
+
+  <!-- =============================================== headline -->
+  <section>
+    <h2>The scorecard</h2>
+
+    <div class="strip">
+      <div class="stat"><span class="n" style="color:var(--saved)">59%</span>
+        <span class="l">cheaper than always-Opus, cascade dispatch</span></div>
+      <div class="stat"><span class="n">8.3&times;</span>
+        <span class="l">cost spread, Haiku to Opus, same workload</span></div>
+      <div class="stat"><span class="n">2.0&times;</span>
+        <span class="l">latency spread, 1,353 ms to 2,769 ms</span></div>
+      <div class="stat"><span class="n" style="color:var(--spend)">19%</span>
+        <span class="l">of tasks where the two models disagree at all</span></div>
+    </div>
+
+    <div class="card">
+      <header>
+        <span class="grade exact">Measured</span>
+        <span class="what">cost from response.usage · latency wall-clock · accuracy with 95% CI</span>
+      </header>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th>Strategy</th><th>Accuracy</th><th>95% CI</th><th>Cost</th>
+                <th>vs Opus</th><th>ms / task</th><th>% to Opus</th><th>Overhead</th></tr>
+          </thead>
+          <tbody>
+            <tr class="dim"><td>always: Haiku</td><td class="n">83.3%</td><td class="n">71–96%</td>
+              <td class="n">$0.0041</td><td class="n up">−88.0%</td><td class="n">1,353</td>
+              <td class="n">0%</td><td class="n">0%</td></tr>
+            <tr class="hl"><td><b>cascade</b></td><td class="n"><b>97.2%</b></td><td class="n">92–100%</td>
+              <td class="n"><b>$0.0140</b></td><td class="n up"><b>−59.0%</b></td><td class="n">2,735</td>
+              <td class="n">14%</td><td class="n down">31.9%</td></tr>
+            <tr class="dim"><td>oracle <span style="color:var(--muted)">(unbuildable)</span></td>
+              <td class="n">94.4%</td><td class="n">87–100%</td><td class="n">$0.0141</td>
+              <td class="n up">−58.6%</td><td class="n">2,056</td><td class="n">22%</td><td class="n">0%</td></tr>
+            <tr><td>heuristic <span style="color:var(--muted)">0 tokens</span></td>
+              <td class="n">97.2%</td><td class="n">92–100%</td><td class="n">$0.0224</td>
+              <td class="n up">−34.3%</td><td class="n">2,008</td><td class="n">58%</td><td class="n">0%</td></tr>
+            <tr><td>lexical <span style="color:var(--muted)">TF-IDF</span></td>
+              <td class="n">86.1%</td><td class="n">75–97%</td><td class="n">$0.0236</td>
+              <td class="n up">−30.7%</td><td class="n">1,946</td><td class="n">58%</td><td class="n">0%</td></tr>
+            <tr><td>LLM classifier</td><td class="n">94.4%</td><td class="n">87–100%</td>
+              <td class="n">$0.0281</td><td class="n">−17.5%</td><td class="n down">3,685</td>
+              <td class="n">67%</td><td class="n down">18.1%</td></tr>
+            <tr class="dim"><td>always: Opus</td><td class="n">91.7%</td><td class="n">83–100%</td>
+              <td class="n">$0.0340</td><td class="n">—</td><td class="n">2,769</td>
+              <td class="n">100%</td><td class="n">0%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="body">
+        <p class="note">
+          <b>Overhead</b> is the share of spend that bought no part of the returned answer:
+          the classifier's own tokens, the cascade's verification call, and cheap attempts
+          discarded on escalation. Read the CI column, not the accuracy column &mdash;
+          every interval overlaps every other.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================== performance -->
+  <section>
+    <h2>Performance</h2>
+    <p>
+      Latency is the axis dispatch usually makes worse. The cascade pays for an extra
+      round trip on every request; the LLM classifier pays for two.
+    </p>
+
+    <div class="card">
+      <header>
+        <span class="grade exact">Measured</span>
+        <span class="what">mean wall-clock per task, all legs summed</span>
+      </header>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Strategy</th><th class="barcell">Latency</th><th>ms</th><th>vs Haiku</th><th>Why</th></tr></thead>
+          <tbody>
+            <tr><td>always: Haiku</td><td class="barcell"><span class="bar fast" style="width:37%"></span></td>
+              <td class="n">1,353</td><td class="n">—</td><td>one call, small model</td></tr>
+            <tr><td>lexical</td><td class="barcell"><span class="bar" style="width:53%"></span></td>
+              <td class="n">1,946</td><td class="n">+44%</td><td>one call, 58% on Opus</td></tr>
+            <tr><td>heuristic</td><td class="barcell"><span class="bar" style="width:54%"></span></td>
+              <td class="n">2,008</td><td class="n">+48%</td><td>one call, routing is free</td></tr>
+            <tr><td>oracle</td><td class="barcell"><span class="bar" style="width:56%"></span></td>
+              <td class="n">2,056</td><td class="n">+52%</td><td>one call, perfect choice</td></tr>
+            <tr class="hl"><td><b>cascade</b></td><td class="barcell"><span class="bar" style="width:74%"></span></td>
+              <td class="n"><b>2,735</b></td><td class="n">+102%</td><td><b>answer + verify, sometimes + escalate</b></td></tr>
+            <tr class="dim"><td>always: Opus</td><td class="barcell"><span class="bar" style="width:75%"></span></td>
+              <td class="n">2,769</td><td class="n">+105%</td><td>one call, large model</td></tr>
+            <tr><td>LLM classifier</td><td class="barcell"><span class="bar slow" style="width:100%"></span></td>
+              <td class="n">3,685</td><td class="n down">+172%</td><td>classify, then answer</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="body">
+        <p class="note">
+          The cascade lands at <b>2,735 ms</b> &mdash; essentially always-Opus latency
+          (2,769 ms) for 41% of always-Opus cost. It buys the saving with round trips, not
+          with a faster model. The classifier is the worst of both: slowest <em>and</em>
+          second-most expensive.
+        </p>
+      </div>
+    </div>
+
+    <div class="takeaway">
+      <p><strong>If time-to-first-token matters, cascade is the wrong tool.</strong> It cannot
+      stream &mdash; the verifier needs the complete cheap answer before it can judge, so a
+      streamed cascade would buffer the whole response. Streaming traffic falls back to the
+      zero-token heuristic, which decides before any tokens are generated.</p>
+    </div>
+  </section>
+
+  <!-- =============================================== accuracy -->
+  <section>
+    <h2>Accuracy, by difficulty</h2>
+    <p>
+      The hard column is where dispatch lives or dies &mdash; and where the sample is
+      thinnest at 12 tasks per tier.
+    </p>
+
+    <div class="card">
+      <header>
+        <span class="grade exact">Measured</span>
+        <span class="what">12 tasks per tier · short-answer grading, deterministic graders</span>
+      </header>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Strategy</th><th>Easy</th><th>Medium</th><th>Hard</th><th>Overall</th></tr></thead>
+          <tbody>
+            <tr class="dim"><td>always: Haiku</td><td class="n">100%</td><td class="n">83%</td>
+              <td class="n down">67%</td><td class="n">83.3%</td></tr>
+            <tr class="dim"><td>always: Opus</td><td class="n down">92%</td><td class="n">92%</td>
+              <td class="n">92%</td><td class="n">91.7%</td></tr>
+            <tr class="hl"><td><b>cascade</b></td><td class="n">100%</td><td class="n">100%</td>
+              <td class="n">92%</td><td class="n"><b>97.2%</b></td></tr>
+            <tr class="hl"><td><b>heuristic</b></td><td class="n">100%</td><td class="n">92%</td>
+              <td class="n up">100%</td><td class="n"><b>97.2%</b></td></tr>
+            <tr><td>LLM classifier</td><td class="n">92%</td><td class="n">100%</td>
+              <td class="n">92%</td><td class="n">94.4%</td></tr>
+            <tr><td>lexical</td><td class="n">92%</td><td class="n">83%</td>
+              <td class="n">83%</td><td class="n">86.1%</td></tr>
+            <tr><td>oracle</td><td class="n">100%</td><td class="n">92%</td>
+              <td class="n">92%</td><td class="n">94.4%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="body">
+        <p class="note">
+          Note the row that ruins a tidy story: <b>Opus scores 92% on easy</b>, below Haiku's
+          100%. One of those misses is a safety refusal &mdash; Opus 5 returned
+          <code>stop_reason: "refusal"</code>, category <code>cyber</code>, on
+          <em>"what exit code does a POSIX shell return when a command is not found?"</em>
+          Haiku answered it fine. Tier dispatch changes your refusal surface, not just your bill.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================== significance -->
+  <section>
+    <h2>None of the accuracy differences are real</h2>
+
+    <div class="card">
+      <header>
+        <span class="grade warn">The caveat that governs everything above</span>
+        <span class="what">exact binomial McNemar on paired per-task correctness</span>
+      </header>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Comparison</th><th>A wins</th><th>B wins</th><th>p</th><th>Conclusion</th></tr></thead>
+          <tbody>
+            <tr class="hl"><td><b>always-Opus vs always-Haiku</b></td><td class="n">5</td><td class="n">2</td>
+              <td class="n"><b>0.453</b></td><td><b>the expensive model is not measurably better</b></td></tr>
+            <tr><td>cascade vs always-Opus</td><td class="n">3</td><td class="n">1</td>
+              <td class="n">0.625</td><td>no detectable difference</td></tr>
+            <tr><td>heuristic vs always-Opus</td><td class="n">2</td><td class="n">0</td>
+              <td class="n">0.500</td><td>no detectable difference</td></tr>
+            <tr><td>cascade vs always-Haiku</td><td class="n">5</td><td class="n">0</td>
+              <td class="n">0.062</td><td>no detectable difference</td></tr>
+            <tr><td>cascade vs heuristic</td><td class="n">1</td><td class="n">1</td>
+              <td class="n">1.000</td><td>no detectable difference</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="strip">
+      <div class="stat"><span class="n" style="color:var(--spend)">~14pp</span>
+        <span class="l">resolution limit at n=36 — smaller gaps are noise</span></div>
+      <div class="stat"><span class="n" style="color:var(--spend)">~584</span>
+        <span class="l">tasks needed to resolve a 5-point difference</span></div>
+      <div class="stat"><span class="n" style="color:var(--spend)">~3,712</span>
+        <span class="l">tasks needed to resolve a 2-point difference</span></div>
+      <div class="stat"><span class="n">36</span>
+        <span class="l">tasks we actually ran</span></div>
+    </div>
+
+    <div class="callout">
+      <p>
+        <strong>The cost column has no error bars.</strong> It is arithmetic over billed
+        tokens from <code>response.usage</code>. The accuracy column has a ±9–14 point
+        interval. So the only defensible claim is
+        <em>&ldquo;59% cheaper with no detected quality regression&rdquo;</em> &mdash;
+        never <em>&ldquo;cheaper and better&rdquo;</em>.
+      </p>
+    </div>
+  </section>
+
+  <!-- =============================================== live proxy -->
+  <section>
+    <h2>The same backend, through the proxy</h2>
+    <p>
+      Benchmark numbers are per-task averages. These are single live requests through
+      <code>dms proxy</code>, which is what production actually looks like.
+    </p>
+
+    <div class="card">
+      <header>
+        <span class="grade exact">Measured live</span>
+        <span class="what">real requests through the running proxy</span>
+      </header>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Request</th><th>Answered by</th><th>Legs</th><th>Cost</th><th>Latency</th></tr></thead>
+          <tbody>
+            <tr><td>simple question, Anthropic ingress</td><td class="n">haiku</td>
+              <td>answer + verify</td><td class="n up">$0.000135</td><td class="n">~2.3 s</td></tr>
+            <tr><td>simple question, Codex ingress</td><td class="n">haiku</td>
+              <td>answer + verify</td><td class="n up">$0.000126</td><td class="n">~2.1 s</td></tr>
+            <tr class="hl"><td><b>consistency-guarantee question</b></td><td class="n"><b>opus</b></td>
+              <td>answer + verify + <b>escalate</b></td><td class="n">$0.002428</td><td class="n down">3.9 s</td></tr>
+            <tr class="dim"><td>2nd turn, same session</td><td class="n">haiku</td>
+              <td>affinity pin held</td><td class="n">—</td><td class="n">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="body">
+        <p class="note">
+          An escalation costs <b>18&times;</b> a clean cascade hit and takes <b>~1.7&times;</b>
+          as long. That ratio is why the escalation rate &mdash; 14% here, against a true need
+          of 14% &mdash; is the number to watch in production, not the average.
+        </p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <p>
+        <strong>And the lever that beat all of this.</strong> Driving the same Claude backend
+        from Codex CLI, whose harness resends a <b>13,443-token</b> prompt every turn:
+        caching that prefix took the steady-state turn from <b>$0.069 to $0.0155</b> &mdash;
+        <b>78% off, no model change, no quality risk.</b> The router sent every one of those
+        requests to Opus anyway, because a 13k prompt trips every length signal there is.
+      </p>
+    </div>
+
+    <div class="takeaway">
+      <p><strong>Ranked by what the numbers support:</strong> fix caching first (78%, no
+      quality risk, measured). Then cascade dispatch (59%, no detected regression, +100%
+      latency). Do not build the LLM classifier (17.5%, slowest, 18% of its budget spent
+      deciding).</p>
+    </div>
+  </section>
+
+  <footer>
+    <p>
+      Every figure here comes from a live run &mdash; 555 calls, $0.2572 of real spend, on
+      <code>claude-haiku-4-5</code> and <code>claude-opus-5</code>. Cost is computed from
+      <code>response.usage</code> with cache reads at 0.10&times; and writes at 1.25&times;;
+      latency is wall-clock across all legs; accuracy is deterministic short-answer grading
+      with the confidence intervals shown.
+    </p>
+    <p style="margin-top:12px">
+      <b>Limits.</b> 36 tasks, one workload, one run, short-answer grading only. Model
+      nondeterminism means the &ldquo;oracle&rdquo; row is not a strict upper bound — it probes
+      models in sequence and can lose a task another strategy happened to win. Reproduce with
+      <code>uv run dms bench --two-tier --mode record</code>.
+    </p>
+  </footer>
+
+</div>
