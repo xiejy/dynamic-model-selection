@@ -446,3 +446,43 @@ def test_an_anthropic_tool_passes_through_untouched() -> None:
     native = {"name": "x", "description": "d", "input_schema": {"type": "object"}}
 
     assert _anthropic_tools((native,)) == [native]
+
+
+# --------------------------------------------------- openrouter / verification
+
+
+def test_openrouter_variant_points_at_openrouter_with_its_own_key_var() -> None:
+    """Same adapter, different config -- so exercising it against OpenRouter is a
+    genuine test of the OpenAI code path, not a parallel implementation."""
+    from dms.dispatch.providers import openrouter_provider
+
+    provider = openrouter_provider()
+
+    assert provider.base_url == "https://openrouter.ai/api/v1"
+    assert provider.key_env == "OPENROUTER_API_KEY"
+    assert provider.handles("openai/gpt-5.6-sol")
+    assert "HTTP-Referer" in provider.headers
+
+
+def test_a_missing_key_names_the_variable_it_wants(monkeypatch) -> None:
+    from dms.dispatch.providers import openrouter_provider
+
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+
+    with pytest.raises(ProviderError, match="OPENROUTER_API_KEY"):
+        _ = openrouter_provider().api_key
+
+
+@pytest.mark.parametrize(
+    "namespaced,bare",
+    [
+        ("openai/gpt-5.6-sol", "gpt-5.6-sol"),
+        ("codex-cli/gpt-5.6-sol", "gpt-5.6-sol"),
+        ("openai/gpt-5.6", "gpt-5.6-sol"),      # via alias
+    ],
+)
+def test_namespaced_ids_price_against_the_bare_model(namespaced, bare) -> None:
+    """The transport differs; the per-token rates do not."""
+    from dms.pricing import PriceBook
+
+    assert PriceBook.load().resolve(namespaced) == bare

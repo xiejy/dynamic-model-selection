@@ -110,10 +110,20 @@ class PriceBook:
         figure is what the equivalent API call would cost -- comparable, not a bill.
         """
         snapshot = self._snapshot(_now_if_needed(at))
-        if model.startswith("codex-cli/"):
-            model = model[len("codex-cli/"):]
         if model in snapshot["models"]:
             return model
+
+        # Namespaced ids -- "codex-cli/gpt-5.6-sol" (this repo) or
+        # "openai/gpt-5.6-sol" (OpenRouter) -- price against the bare model.
+        # The transport differs; the per-token rates do not.
+        if "/" in model:
+            bare = model.split("/", 1)[1]
+            if bare in snapshot["models"]:
+                return bare
+            model = snapshot.get("aliases", {}).get(bare, bare)
+            if model in snapshot["models"]:
+                return model
+
         return snapshot.get("aliases", {}).get(model, model)
 
     def rate(self, model: str, at: str | datetime = "now") -> Rate:

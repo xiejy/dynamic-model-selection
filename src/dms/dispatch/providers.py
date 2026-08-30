@@ -23,6 +23,7 @@ from typing import Any, Protocol
 from dms.usage import UsageRecord
 
 OPENAI_BASE_URL = "https://api.openai.com/v1"
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 DEFAULT_TIMEOUT_SECONDS = 600
 
 
@@ -291,22 +292,28 @@ class OpenAIProvider:
         api_key: str | None = None,
         base_url: str = OPENAI_BASE_URL,
         timeout: int = DEFAULT_TIMEOUT_SECONDS,
-        prefixes: tuple[str, ...] = ("gpt-", "o1", "o3", "o4", "codex"),
+        prefixes: tuple[str, ...] = ("gpt-", "o1", "o3", "o4", "codex", "openai/"),
+        key_env: str = "OPENAI_API_KEY",
+        headers: dict[str, str] | None = None,
     ) -> None:
         self._api_key = api_key
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
         self.prefixes = prefixes
+        # OpenRouter and Azure read the key from a different variable and want
+        # their own attribution headers; both are config, not code.
+        self.key_env = key_env
+        self.headers = headers or {}
 
     def handles(self, model: str) -> bool:
         return model.startswith(self.prefixes)
 
     @property
     def api_key(self) -> str:
-        key = self._api_key or os.environ.get("OPENAI_API_KEY")
+        key = self._api_key or os.environ.get(self.key_env)
         if not key:
             raise ProviderError(
-                "OPENAI_API_KEY is not set; cannot call GPT/Codex models"
+                f"{self.key_env} is not set; cannot call models at {self.base_url}"
             )
         return key
 
@@ -338,6 +345,7 @@ class OpenAIProvider:
             headers={
                 "Authorization": f"Bearer {self.api_key}",
                 "Content-Type": "application/json",
+                **self.headers,
             },
         )
         try:
@@ -433,6 +441,25 @@ def _to_openai_messages(messages: tuple[dict[str, Any], ...]) -> list[dict[str, 
             )
         out.append({"role": message.get("role", "user"), "content": content or ""})
     return out
+
+
+def openrouter_provider(**kwargs: Any) -> OpenAIProvider:
+    """The same adapter pointed at OpenRouter.
+
+    OpenRouter speaks the OpenAI wire format, so this exercises exactly the code
+    path that serves OpenAI itself -- which makes it a genuine verification of
+    that adapter, not a separate one. Model ids are `vendor/model`.
+    """
+    return OpenAIProvider(
+        base_url=OPENROUTER_BASE_URL,
+        key_env="OPENROUTER_API_KEY",
+        prefixes=("openai/", "anthropic/", "google/", "meta-llama/", "deepseek/", "gpt-"),
+        headers={
+            "HTTP-Referer": "https://github.com/dynamic-model-selection",
+            "X-Title": "dms dispatch",
+        },
+        **kwargs,
+    )
 
 
 class ProviderRegistry:

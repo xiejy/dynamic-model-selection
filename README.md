@@ -412,9 +412,32 @@ costs 180× more and takes 9× longer to do it.
 - streaming is chunk-per-message, because Codex's JSONL carries completed items rather
   than token deltas.
 
-Use it to reach GPT without a key or to compare tiers across providers. For
-latency-sensitive traffic the API path (`OpenAIProvider`) is the right one — though that
-path is still **untested against real GPT traffic**, since no `OPENAI_API_KEY` is set here.
+Use it to reach GPT without a key or to compare tiers across providers.
+
+### ⚠️ The OpenAI API adapter is UNVERIFIED
+
+`OpenAIProvider` has **never made a live call**. It is the right backend for production —
+the CLI path adds ~13s and a ~17k-token harness per request, which is fine for comparison
+and unusable in front of traffic — but nothing about it has been observed:
+
+- **the model ids may be wrong.** `gpt-5.6-sol` / `luna` / `terra` came from a *Codex
+  session* cost table under ChatGPT auth. They may be product-tier names rather than API
+  model ids, in which case every GPT dispatch 404s on the model name.
+- `max_completion_tokens` and `stream_options: {include_usage: true}` acceptance is
+  assumed from the spec.
+- the response and streaming parsers were written from documentation, never against a
+  real body.
+
+Do not deploy the API path on the strength of the CLI path working. One command closes it:
+
+```bash
+export OPENROUTER_API_KEY=sk-or-v1-...        # or OPENAI_API_KEY + DMS_VERIFY_TARGET=openai
+uv run python examples/07_verify_openai_adapter.py
+```
+
+OpenRouter speaks the OpenAI wire format, so this exercises the *same* payload builder,
+response parser and streaming reader that serve OpenAI — a real verification, not a stand-in.
+With no key it exits 2 and says plainly that nothing was verified.
 
 ### Multi-provider
 
