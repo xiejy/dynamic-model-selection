@@ -234,10 +234,80 @@
         <p class="note">
           <b>Overhead</b> is the share of spend that bought no part of the returned answer:
           the classifier's own tokens, the cascade's verification call, and cheap attempts
-          discarded on escalation. Read the CI column, not the accuracy column &mdash;
-          every interval overlaps every other.
+          discarded on escalation.
+          <br><br>
+          <b>Read the CI column, not the accuracy column.</b> Every interval overlaps every
+          other. The cascade tops the accuracy column by two tasks out of thirty-six &mdash;
+          the next section takes those two apart, and one of them is a coin flip.
         </p>
       </div>
+    </div>
+  </section>
+
+  <!-- =============================================== why cascade looks best -->
+  <section>
+    <h2>Why does the cascade top the accuracy column?</h2>
+    <p>
+      It shouldn't, and the honest answer is that <strong>it doesn't really.</strong> A
+      strategy that sends 86% of traffic to the cheap model has no business out-scoring the
+      expensive one. The entire margin is <strong>two tasks out of thirty-six</strong>, and it
+      dissolves when you look at them.
+    </p>
+
+    <div class="card">
+      <header>
+        <span class="grade warn">Decomposition</span>
+        <span class="what">every task where cascade and always-Opus disagree</span>
+      </header>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Task</th><th>Cascade</th><th>Answered by</th><th>always-Opus</th>
+                     <th>Haiku alone</th><th style="text-align:left">What actually happened</th></tr></thead>
+          <tbody>
+            <tr><td class="n">e09</td><td class="n up">right</td><td class="n">haiku</td>
+              <td class="n down">wrong</td><td class="n up">right</td>
+              <td style="text-align:left"><b>Opus refused it</b> (<code>cyber</code>). The cascade
+                never escalated, so it dodged the refusal.</td></tr>
+            <tr class="hl"><td class="n">m03</td><td class="n up">right</td><td class="n">haiku</td>
+              <td class="n down">wrong</td><td class="n up">right</td>
+              <td style="text-align:left"><b>The only genuine win</b> — Haiku right, Opus wrong.</td></tr>
+            <tr><td class="n">h11</td><td class="n up">right</td><td class="n"><b>opus</b></td>
+              <td class="n down">wrong</td><td class="n down">wrong</td>
+              <td style="text-align:left"><b>Not a win at all.</b> Cascade escalated to Opus and got it
+                right; always-Opus asked <em>the same model the same question</em> and got it wrong.
+                Nondeterminism.</td></tr>
+            <tr><td class="n">h12</td><td class="n down">wrong</td><td class="n">haiku</td>
+              <td class="n up">right</td><td class="n down">wrong</td>
+              <td style="text-align:left"><b>Verifier miss</b> — accepted a wrong Haiku answer, so it
+                never escalated.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="body">
+        <p class="note">
+          Three wins minus one loss is <b>+2 tasks = +5.6 points</b>, and that is the whole of
+          &ldquo;97.2% vs 91.7%&rdquo;. Of the three wins: <b>one clean, one a safety-classifier
+          quirk, one a coin flip.</b> This is precisely why the paired test returns
+          <b>p = 0.625</b>.
+        </p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <p>
+        <strong>Do not present the accuracy column as a ranking.</strong> At 36 tasks it is
+        noise sorted by luck. The columns that carry real signal are <b>cost</b> (exact,
+        from billed tokens), <b>latency</b> (wall-clock), and <b>% to Opus</b> (a count, not
+        an estimate). If someone asks &ldquo;so the cascade is more accurate?&rdquo;, the
+        correct answer is <em>&ldquo;we can't tell, and neither can anyone else at this
+        sample size.&rdquo;</em>
+      </p>
+    </div>
+
+    <div class="takeaway">
+      <p><strong>The one thing this does establish:</strong> the cascade did not <em>lose</em>
+      accuracy while cutting cost 59%. &ldquo;No detected regression&rdquo; is a real and
+      useful claim. &ldquo;Better&rdquo; is not.</p>
     </div>
   </section>
 
