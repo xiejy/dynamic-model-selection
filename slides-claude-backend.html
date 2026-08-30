@@ -117,6 +117,68 @@
     </div>
   </header>
 
+  <!-- =============================================== what the rows are -->
+  <section>
+    <h2>What the seven strategies are</h2>
+    <p>
+      Two of these rows are baselines. The rest are attempts to land inside the gap
+      between them &mdash; and there are only two ways to try: <strong>guess before you
+      generate, or check after.</strong>
+    </p>
+
+    <div class="card">
+      <header>
+        <span class="what">read this before the scorecard &mdash; it is the frame</span>
+      </header>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th>Strategy</th><th style="text-align:left">Kind</th>
+                <th style="text-align:left">How it decides</th>
+                <th>Extra calls</th><th>Sent to Opus</th></tr>
+          </thead>
+          <tbody>
+            <tr class="dim"><td>always: Haiku</td><td style="text-align:left">baseline</td>
+              <td style="text-align:left">it doesn't &mdash; every task to the cheap model</td>
+              <td class="n">0</td><td class="n">0 / 36</td></tr>
+            <tr class="dim"><td>always: Opus</td><td style="text-align:left">baseline</td>
+              <td style="text-align:left">it doesn't &mdash; every task to the dear model</td>
+              <td class="n">0</td><td class="n">36 / 36</td></tr>
+            <tr><td>heuristic</td><td style="text-align:left">guess <em>before</em></td>
+              <td style="text-align:left">scores the prompt on seven regex and length signals, then bands the score</td>
+              <td class="n up">0 &mdash; zero tokens</td><td class="n">21 / 36</td></tr>
+            <tr><td>lexical</td><td style="text-align:left">guess <em>before</em></td>
+              <td style="text-align:left">TF-IDF cosine similarity against labelled example prompts</td>
+              <td class="n up">0 &mdash; local math</td><td class="n">21 / 36</td></tr>
+            <tr><td>LLM classifier</td><td style="text-align:left">guess <em>before</em></td>
+              <td style="text-align:left"><em>asks Haiku</em> &ldquo;simple, medium or complex?&rdquo;</td>
+              <td class="n down">1 on every task</td><td class="n">24 / 36</td></tr>
+            <tr class="hl"><td><b>cascade</b></td><td style="text-align:left"><b>check <em>after</em></b></td>
+              <td style="text-align:left"><b>Haiku answers &rarr; Haiku checks its own answer &rarr; escalate only if the check fails</b></td>
+              <td class="n">1 verify always,<br>+1 on escalation</td><td class="n"><b>5 / 36</b></td></tr>
+            <tr class="dim"><td>oracle</td><td style="text-align:left">cheat</td>
+              <td style="text-align:left">reads the answer key, picks the cheapest model that would be right &mdash; unbuildable, shown for scale</td>
+              <td class="n">0</td><td class="n">8 / 36</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="body">
+        <p class="note">
+          The column that tells the story is <b>Sent to Opus</b>. All three
+          guess-before routers land at 58&ndash;67%: <b>when unsure, they panic and pay up</b>,
+          which is why none saves more than a third. The cascade sends <b>14%</b> &mdash; not
+          because it guesses better, but because it does not guess at all.
+        </p>
+      </div>
+    </div>
+
+    <div class="takeaway">
+      <p><strong>The trap is the obvious design.</strong> &ldquo;Ask a smart model which model
+      to use&rdquo; comes last on every axis: dearest of the routers, slowest at 3,685 ms, and
+      18.1% of its budget spent deciding rather than answering.</p>
+    </div>
+  </section>
+
   <!-- =============================================== headline -->
   <section>
     <h2>The scorecard</h2>
