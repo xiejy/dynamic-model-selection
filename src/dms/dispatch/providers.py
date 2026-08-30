@@ -446,10 +446,20 @@ class ProviderRegistry:
         cache_ttl: str = "5m",
         book: Any | None = None,
     ) -> None:
-        self.providers = providers or (
-            AnthropicProvider(cache_system=cache_system, cache_ttl=cache_ttl, book=book),
-            OpenAIProvider(),  # OpenAI caches automatically; nothing to declare
-        )
+        if providers is None:
+            from dms.dispatch.codex_cli import CodexCLIProvider
+
+            providers = (
+                AnthropicProvider(
+                    cache_system=cache_system, cache_ttl=cache_ttl, book=book
+                ),
+                # Must precede OpenAIProvider: a `codex-cli/gpt-...` id would
+                # otherwise be claimed by the API adapter and sent to a key that
+                # may not exist.
+                CodexCLIProvider(),
+                OpenAIProvider(),  # OpenAI caches automatically; nothing to declare
+            )
+        self.providers = providers
 
     def for_model(self, model: str) -> Provider:
         for provider in self.providers:

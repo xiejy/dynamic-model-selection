@@ -376,6 +376,46 @@ Note the first turn costs *more* than uncached ($0.0817 vs $0.069): the 1.25× w
 premium. Break-even is the second request, exactly as the 5-minute-TTL arithmetic says.
 If your agent client sends one turn and leaves, caching loses.
 
+### Codex as a *backend*, with no API key
+
+`codex exec --json` authenticates through your ChatGPT login and emits JSONL carrying both
+things a provider needs: the answer on an `item.completed` / `agent_message` event, and
+token counts on `turn.completed`. So GPT is reachable as a tier with **no
+`OPENAI_API_KEY`**:
+
+```bash
+uv run dms proxy --low claude-haiku-4-5 --high codex-cli/gpt-5.6-sol
+```
+
+Model ids are namespaced `codex-cli/<model>` so they can never be confused with API ids —
+one needs a ChatGPT login, the other a metered key, and a silent mix-up would call the
+wrong backend and report the wrong cost. Costs are computed from the underlying model's
+published rates: **what the equivalent API call would cost**, useful for comparison, not a
+bill.
+
+**Verified live, cross-provider** — Haiku low tier, GPT-5.6-sol high tier:
+
+| | answered by | result | prompt tokens | cost | latency |
+|---|---|---|---:|---:|---:|
+| forced high | `codex-cli/gpt-5.6-sol` | **5** ✅ | 16,792 (11,008 cached) | $0.0368 | 13.6s |
+| cascade, same question | `claude-haiku-4-5` | 4 ❌ | 1,200 | $0.0002 | 1.5s |
+
+The cross-provider escalation gets right what the same-provider cascade got wrong — and
+costs 180× more and takes 9× longer to do it.
+
+**It is an agent, not a completion endpoint**, and that shapes everything:
+- it carries a ~17k-token harness, so a short question is never a short request;
+- it *runs tools* — an observed run shelled out to `sed` before answering. This provider
+  forces `--sandbox read-only` and never forwards caller-supplied tool definitions, but it
+  cannot make Codex stop being an agent;
+- latency is ~10–14s, dominated by process start and the agent loop, not the model;
+- streaming is chunk-per-message, because Codex's JSONL carries completed items rather
+  than token deltas.
+
+Use it to reach GPT without a key or to compare tiers across providers. For
+latency-sensitive traffic the API path (`OpenAIProvider`) is the right one — though that
+path is still **untested against real GPT traffic**, since no `OPENAI_API_KEY` is set here.
+
 ### Multi-provider
 
 GPT-5.x/Codex rates were mirrored into `config/model-pricing.json` from

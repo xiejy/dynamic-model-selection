@@ -103,8 +103,15 @@ class PriceBook:
         return eligible[-1]
 
     def resolve(self, model: str, at: str | datetime = "now") -> str:
-        """Map an alias ('opus') to a full model id ('claude-opus-5')."""
+        """Map an alias ('opus') to a full model id ('claude-opus-5').
+
+        A `codex-cli/<model>` id costs against `<model>`'s published rates. Spend
+        there lands on a ChatGPT subscription rather than a metered key, so the
+        figure is what the equivalent API call would cost -- comparable, not a bill.
+        """
         snapshot = self._snapshot(_now_if_needed(at))
+        if model.startswith("codex-cli/"):
+            model = model[len("codex-cli/"):]
         if model in snapshot["models"]:
             return model
         return snapshot.get("aliases", {}).get(model, model)
