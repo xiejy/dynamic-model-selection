@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "_note": "Schema mirrors ~/workspace/.workspace/ai-metrics/config/model-pricing.json. Rates are decimal STRINGS so they parse into Decimal without binary-float error. Snapshots are ordered by effective_from and are immutable once written.",
+  "cache_multipliers": {
+    "_note": "Uniform across Claude models. Applied to the model's input rate.",
+    "read": "0.10",
+    "write_5m": "1.25",
+    "write_1h": "2.00"
+  },
+  "batch_multiplier": "0.50",
+  "tracked_models": [
+    "claude-haiku-4-5",
+    "claude-opus-5",
+    "claude-sonnet-5",
+    "gpt-5",
+    "gpt-5.5",
+    "gpt-5.6-luna",
+    "gpt-5.6-sol",
+    "gpt-5.6-terra"
+  ],
+  "min_cache_prefix_tokens": {
+    "_note": "NOT monotonic with price. Below these thresholds caching silently no-ops: no error, just cache_creation_input_tokens == 0. This is the core of the routing-vs-caching tension.",
+    "claude-opus-5": 512,
+    "claude-fable-5": 512,
+    "claude-sonnet-5": 1024,
+    "claude-opus-4-8": 1024,
+    "claude-opus-4-7": 2048,
+    "claude-haiku-4-5": 4096
+  },
+  "context_window": {
+    "claude-opus-5": 1000000,
+    "claude-sonnet-5": 1000000,
+    "claude-haiku-4-5": 200000,
+    "gpt-5": 400000,
+    "gpt-5.5": 400000,
+    "gpt-5.6-luna": 400000,
+    "gpt-5.6-sol": 400000,
+    "gpt-5.6-terra": 400000
+  },
+  "snapshots": [
+    {
+      "id": "2026-08-intro",
+      "effective_from": "2026-01-01T00:00:00Z",
+      "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+      "aliases": {
+        "haiku": "claude-haiku-4-5",
+        "opus": "claude-opus-5",
+        "sonnet": "claude-sonnet-5",
+        "gpt-5.6": "gpt-5.6-sol",
+        "codex": "gpt-5.6-sol"
+      },
+      "models": {
+        "claude-haiku-4-5": {
+          "input_usd_per_million": "1.00",
+          "output_usd_per_million": "5.00"
+        },
+        "claude-opus-5": {
+          "input_usd_per_million": "5.00",
+          "output_usd_per_million": "25.00"
+        },
+        "claude-sonnet-5": {
+          "_note": "Introductory rate, expires 2026-08-31. Sticker is 3.00/15.00.",
+          "input_usd_per_million": "2.00",
+          "output_usd_per_million": "10.00"
+        },
+        "gpt-5": {
+          "input_usd_per_million": "1.25",
+          "cached_input_usd_per_million": "0.125",
+          "output_usd_per_million": "10"
+        },
+        "gpt-5.5": {
+          "input_usd_per_million": "5",
+          "cached_input_usd_per_million": "0.5",
+          "output_usd_per_million": "30"
+        },
+        "gpt-5.6-luna": {
+          "input_usd_per_million": "1",
+          "cached_input_usd_per_million": "0.1",
+          "output_usd_per_million": "6"
+        },
+        "gpt-5.6-sol": {
+          "input_usd_per_million": "5",
+          "cached_input_usd_per_million": "0.5",
+          "output_usd_per_million": "30"
+        },
+        "gpt-5.6-terra": {
+          "input_usd_per_million": "2.5",
+          "cached_input_usd_per_million": "0.25",
+          "output_usd_per_million": "15"
+        }
+      }
+    },
+    {
+      "id": "2026-09-sticker",
+      "effective_from": "2026-09-01T00:00:00Z",
+      "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+      "aliases": {
+        "haiku": "claude-haiku-4-5",
+        "opus": "claude-opus-5",
+        "sonnet": "claude-sonnet-5",
+        "gpt-5.6": "gpt-5.6-sol",
+        "codex": "gpt-5.6-sol"
+      },
+      "models": {
+        "claude-haiku-4-5": {
+          "input_usd_per_million": "1.00",
+          "output_usd_per_million": "5.00"
+        },
+        "claude-opus-5": {
+          "input_usd_per_million": "5.00",
+          "output_usd_per_million": "25.00"
+        },
+        "claude-sonnet-5": {
+          "input_usd_per_million": "3.00",
+          "output_usd_per_million": "15.00"
+        },
+        "gpt-5": {
+          "input_usd_per_million": "1.25",
+          "cached_input_usd_per_million": "0.125",
+          "output_usd_per_million": "10"
+        },
+        "gpt-5.5": {
+          "input_usd_per_million": "5",
+          "cached_input_usd_per_million": "0.5",
+          "output_usd_per_million": "30"
+        },
+        "gpt-5.6-luna": {
+          "input_usd_per_million": "1",
+          "cached_input_usd_per_million": "0.1",
+          "output_usd_per_million": "6"
+        },
+        "gpt-5.6-sol": {
+          "input_usd_per_million": "5",
+          "cached_input_usd_per_million": "0.5",
+          "output_usd_per_million": "30"
+        },
+        "gpt-5.6-terra": {
+          "input_usd_per_million": "2.5",
+          "cached_input_usd_per_million": "0.25",
+          "output_usd_per_million": "15"
+        }
+      }
+    }
+  ],
+  "_provider_note": "OpenAI models price cached input with an explicit cached_input_usd_per_million rate; Anthropic models derive it from cache_multipliers.read. PriceBook prefers the explicit rate when present. OpenAI caching is automatic with no write premium, so those models have no cache floor and no cache_creation charge."
+}

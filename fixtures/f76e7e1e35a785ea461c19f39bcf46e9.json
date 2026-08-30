@@ -1,0 +1,14 @@
+{
+  "model": "claude-sonnet-5",
+  "text": "3",
+  "usage": {
+    "input_tokens": 99,
+    "output_tokens": 3,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0
+  },
+  "latency_ms": 1422.563,
+  "simulated": false,
+  "stop_reason": "end_turn",
+  "refusal_category": ""
+}

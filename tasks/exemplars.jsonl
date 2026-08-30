@@ -1,0 +1,24 @@
+{"tier": "simple", "text": "Extract the port number from this connection string. Answer with the number only."}
+{"tier": "simple", "text": "Classify this log line as DEBUG, INFO, WARN or ERROR. Answer with the level only."}
+{"tier": "simple", "text": "Which language uses the .kt file extension? Answer with the language name only."}
+{"tier": "simple", "text": "What is the decimal value of the binary literal 0b1010? Answer with the number only."}
+{"tier": "simple", "text": "Give the shell command that lists files sorted by modification time. Answer with the command only."}
+{"tier": "simple", "text": "Extract the value of \"timeout\" from this JSON payload. Answer with the value only."}
+{"tier": "simple", "text": "Is HTTP GET a safe method? Answer yes or no."}
+{"tier": "simple", "text": "How many bytes are in one kibibyte? Answer with the number only."}
+{"tier": "medium", "text": "Given table users(id, email, created_at), write a SQL query returning the ten most recently created users. Answer with the SQL only."}
+{"tier": "medium", "text": "Name the bug in this function in five words or fewer.\n\ndef total(items):\n    s = 0\n    for i in range(len(items) + 1):\n        s += items[i]\n    return s"}
+{"tier": "medium", "text": "Which HTTP status code should a server return when the request body fails schema validation? Answer with the number only."}
+{"tier": "medium", "text": "Write the cron expression for 'every day at 15:30'. Answer with the five-field expression only."}
+{"tier": "medium", "text": "In a Dockerfile, why should dependency installation come before copying application source? Answer in under ten words."}
+{"tier": "medium", "text": "Which design pattern describes wrapping an object to add behaviour without changing its interface? Answer with the pattern name only."}
+{"tier": "medium", "text": "A query filtering on status and sorting by created_at is slow. Which composite index would help? Answer with the columns only."}
+{"tier": "medium", "text": "What does this Python expression evaluate to? Answer with the number only.\n\nsum(1 for c in 'mississippi' if c == 's')"}
+{"tier": "complex", "text": "Two threads acquire locks A and B in opposite orders with no timeout. Explain whether deadlock is possible and why."}
+{"tier": "complex", "text": "Derive the worst-case time complexity of this nested loop where the inner bound depends on the outer index. Answer with big-O notation only."}
+{"tier": "complex", "text": "A write is acknowledged by the leader then a read hits a lagging follower and returns stale data. Which consistency guarantee has been violated?"}
+{"tier": "complex", "text": "Explain the root cause of catastrophic backtracking in a nested-quantifier regular expression and why the input length matters."}
+{"tier": "complex", "text": "Trace this stateful algorithm step by step for four iterations and report the final accumulator value. Answer with the number only."}
+{"tier": "complex", "text": "Given an LRU cache of fixed capacity and an access sequence, work out how many evictions occur in total. Answer with the number only."}
+{"tier": "complex", "text": "Why does a closure created inside a loop capture the final loop variable rather than its value at each iteration? Answer in five words or fewer."}
+{"tier": "complex", "text": "What is the theoretical lower bound on comparisons required to sort n elements, and why can no comparison sort beat it?"}

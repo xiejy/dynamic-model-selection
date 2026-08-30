@@ -1,0 +1,14 @@
+{
+  "model": "claude-opus-5",
+  "text": "SELECT customer_id, COUNT(*) AS order_count\nFROM orders\nGROUP BY customer_id;",
+  "usage": {
+    "input_tokens": 110,
+    "output_tokens": 41,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0
+  },
+  "latency_ms": 2972.919,
+  "simulated": false,
+  "stop_reason": "end_turn",
+  "refusal_category": ""
+}

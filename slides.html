@@ -1,0 +1,726 @@
+<title>The Token Spend Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+
+<style>
+  :root {
+    --ground:   #F1F4F7;
+    --surface:  #FFFFFF;
+    --sunk:     #E8EDF2;
+    --ink:      #131B23;
+    --muted:    #5A6773;
+    --rule:     #D7DFE6;
+    --accent:   #1F5F8B;
+    --spend:    #A85B27;
+    --saved:    #226F5E;
+    --shadow:   0 1px 2px rgba(19,27,35,.06), 0 8px 24px -14px rgba(19,27,35,.22);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:  #0E141A;
+      --surface: #161E26;
+      --sunk:    #1D262F;
+      --ink:     #E2E9EF;
+      --muted:   #96A3B0;
+      --rule:    #27333E;
+      --accent:  #62AEDF;
+      --spend:   #DE9059;
+      --saved:   #57BCA1;
+      --shadow:  0 1px 2px rgba(0,0,0,.4), 0 10px 28px -16px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:  #0E141A;
+    --surface: #161E26;
+    --sunk:    #1D262F;
+    --ink:     #E2E9EF;
+    --muted:   #96A3B0;
+    --rule:    #27333E;
+    --accent:  #62AEDF;
+    --spend:   #DE9059;
+    --saved:   #57BCA1;
+    --shadow:  0 1px 2px rgba(0,0,0,.4), 0 10px 28px -16px rgba(0,0,0,.7);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+    font-size: 17px;
+    line-height: 1.62;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page { max-width: 1000px; margin: 0 auto; padding: 0 24px 96px; }
+
+  /* ------------------------------------------------------------ masthead */
+  .masthead { padding: 72px 0 40px; border-bottom: 2px solid var(--ink); }
+  .kicker {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 12px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--accent); margin: 0 0 20px;
+  }
+  h1 {
+    font-family: Archivo, ui-sans-serif, system-ui, sans-serif;
+    font-weight: 700; font-size: clamp(2.4rem, 6vw, 4rem); line-height: 1.02;
+    letter-spacing: -.032em; margin: 0 0 20px; text-wrap: balance;
+  }
+  .standfirst {
+    font-size: clamp(1.05rem, 2.1vw, 1.3rem); color: var(--muted);
+    max-width: 60ch; margin: 0 0 28px;
+  }
+  .standfirst strong { color: var(--ink); font-weight: 600; }
+
+  .meta {
+    display: flex; flex-wrap: wrap; gap: 10px 28px;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 12px; color: var(--muted); padding-bottom: 8px;
+  }
+  .meta b { color: var(--ink); font-weight: 500; }
+
+  /* ------------------------------------------------------------ sections */
+  section { padding: 56px 0 8px; border-bottom: 1px solid var(--rule); }
+  section:last-of-type { border-bottom: none; }
+
+  .num {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 12px; font-weight: 700; letter-spacing: .1em;
+    color: var(--accent); display: block; margin-bottom: 12px;
+  }
+  h2 {
+    font-family: Archivo, ui-sans-serif, system-ui, sans-serif;
+    font-weight: 600; font-size: clamp(1.55rem, 3.4vw, 2.15rem); line-height: 1.12;
+    letter-spacing: -.02em; margin: 0 0 16px; text-wrap: balance; max-width: 24ch;
+  }
+  h3 {
+    font-family: Archivo, ui-sans-serif, system-ui, sans-serif;
+    font-weight: 600; font-size: 1.05rem; letter-spacing: -.008em;
+    margin: 32px 0 12px;
+  }
+  p { margin: 0 0 18px; max-width: 68ch; }
+  .lede { font-size: 1.08rem; }
+  a { color: var(--accent); text-underline-offset: 3px; }
+
+  /* --------------------------------------------------- provenance chips */
+  .grade {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 10.5px; font-weight: 700; letter-spacing: .11em;
+    text-transform: uppercase; padding: 4px 9px; border-radius: 3px;
+    border: 1px solid; white-space: nowrap;
+  }
+  .grade::before {
+    content: ""; width: 6px; height: 6px; border-radius: 50%;
+    background: currentColor; flex: none;
+  }
+  .grade.exact { color: var(--saved); border-color: color-mix(in srgb, var(--saved) 42%, transparent); }
+  .grade.sim   { color: var(--spend); border-color: color-mix(in srgb, var(--spend) 42%, transparent); }
+  .grade.cite  { color: var(--muted); border-color: var(--rule); }
+
+  .evidence {
+    background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+    box-shadow: var(--shadow); margin: 26px 0 24px; overflow: hidden;
+  }
+  .evidence > header {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+    padding: 12px 18px; border-bottom: 1px solid var(--rule); background: var(--sunk);
+  }
+  .evidence > header .what {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 11.5px; letter-spacing: .05em; color: var(--muted);
+  }
+  .evidence .body { padding: 18px; }
+  .scroll { overflow-x: auto; }
+
+  /* ------------------------------------------------------------- tables */
+  table {
+    border-collapse: collapse; width: 100%; min-width: 520px;
+    font-variant-numeric: tabular-nums; font-size: 14.5px;
+  }
+  th, td { padding: 9px 14px; text-align: right; border-bottom: 1px solid var(--rule); }
+  th:first-child, td:first-child { text-align: left; }
+  thead th {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 10.5px; letter-spacing: .09em; text-transform: uppercase;
+    color: var(--muted); font-weight: 500; border-bottom: 1px solid var(--ink);
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  td.n { font-family: "JetBrains Mono", ui-monospace, monospace; }
+  tr.hl td { background: color-mix(in srgb, var(--accent) 9%, transparent); }
+  tr.dim td { color: var(--muted); }
+  .up { color: var(--saved); font-weight: 600; }
+  .down { color: var(--spend); font-weight: 600; }
+  .note { font-size: 13.5px; color: var(--muted); margin: 12px 0 0; max-width: 72ch; }
+
+  /* ------------------------------------------------------------- charts */
+  figure { margin: 0; }
+  svg { display: block; width: 100%; height: auto; }
+  .axis { stroke: var(--rule); stroke-width: 1; }
+  .gridline { stroke: var(--rule); stroke-width: 1; stroke-dasharray: 2 4; }
+  .tick {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 10px; fill: var(--muted);
+  }
+  .serieslabel {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 11px; font-weight: 700;
+  }
+  .pointlabel {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 10.5px; fill: var(--muted);
+  }
+
+  /* ------------------------------------------------------------ takeaway */
+  .takeaway {
+    display: flex; gap: 16px; align-items: flex-start;
+    border-left: 3px solid var(--accent);
+    padding: 4px 0 4px 18px; margin: 26px 0 8px; max-width: 72ch;
+  }
+  .takeaway p { margin: 0; font-size: 1.05rem; }
+  .takeaway strong { font-weight: 600; }
+
+  ul { padding-left: 20px; max-width: 70ch; }
+  li { margin-bottom: 10px; }
+  code {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: .875em; background: var(--sunk); padding: 1px 5px; border-radius: 3px;
+  }
+
+  .callout {
+    background: var(--sunk); border: 1px solid var(--rule); border-left: 3px solid var(--spend);
+    border-radius: 4px; padding: 16px 18px; margin: 24px 0; max-width: 72ch;
+  }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout .grade { margin-bottom: 10px; }
+
+  /* --------------------------------------------------------------- misc */
+  .cols { display: grid; gap: 22px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .card {
+    background: var(--surface); border: 1px solid var(--rule);
+    border-radius: 6px; padding: 18px; box-shadow: var(--shadow);
+  }
+  .card h4 {
+    font-family: Archivo, sans-serif; font-size: .95rem; font-weight: 600;
+    margin: 0 0 8px;
+  }
+  .card p { font-size: 14.5px; margin: 0; color: var(--muted); }
+  .stat {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 2rem; font-weight: 700; letter-spacing: -.02em;
+    display: block; margin-bottom: 4px;
+  }
+
+  .steps { list-style: none; padding: 0; counter-reset: step; max-width: 72ch; }
+  .steps li {
+    counter-increment: step; position: relative; padding-left: 42px; margin-bottom: 18px;
+  }
+  .steps li::before {
+    content: counter(step); position: absolute; left: 0; top: 1px;
+    font-family: "JetBrains Mono", monospace; font-size: 12px; font-weight: 700;
+    color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+    width: 26px; height: 26px; border-radius: 50%;
+    display: grid; place-items: center;
+  }
+
+  footer {
+    padding: 48px 0 0; margin-top: 40px; border-top: 2px solid var(--ink);
+    font-size: 14px; color: var(--muted);
+  }
+  footer p { max-width: 72ch; }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+  @media (max-width: 640px) {
+    body { font-size: 16px; }
+    .page { padding: 0 18px 64px; }
+    .masthead { padding: 48px 0 32px; }
+  }
+</style>
+
+<div class="page">
+
+  <header class="masthead">
+    <p class="kicker">Engineering share &middot; measured on 36 tasks, $0.50 of API spend</p>
+    <h1>Is a high/low model dispatcher worth building?</h1>
+    <p class="standfirst">
+      One decision per request: send it to the cheap model or the expensive one. We built five
+      dispatchers, ran them against Haiku&nbsp;4.5 and Opus&nbsp;5 on the same workload, and charged
+      every dispatcher for its own tokens. <strong>The cost savings are real and large. Not one of
+      the quality differences was statistically detectable</strong> &mdash; including whether the
+      expensive model is better at all.
+    </p>
+    <div class="meta">
+      <span><b>Low</b> claude-haiku-4-5 &middot; $1/$5</span>
+      <span><b>High</b> claude-opus-5 &middot; $5/$25</span>
+      <span><b>Workload</b> 36 dev tasks, 12 each easy/medium/hard</span>
+      <span><b>Calls</b> 555 live</span>
+      <span><b>Tests</b> 133</span>
+    </div>
+  </header>
+
+  <!-- ============================================================== 01 -->
+  <section>
+    <span class="num">01 / THE CEILING</span>
+    <h2>Only 19% of the workload is routable at all</h2>
+    <p class="lede">
+      Before evaluating any dispatcher, measure how often the two models actually disagree. Where
+      they agree, the dispatcher cannot change quality &mdash; only cost. That share is a hard
+      ceiling on dispatch value, and it is a property of <em>your workload</em>, not of your router.
+    </p>
+
+    <div class="evidence">
+      <header>
+        <span class="grade exact">Measured</span>
+        <span class="what">per-task verdicts, Haiku 4.5 vs Opus 5, 36 tasks</span>
+      </header>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Outcome</th><th>Tasks</th><th>Share</th><th>What a dispatcher can do</th></tr></thead>
+          <tbody>
+            <tr><td>Both right</td><td class="n">28</td><td class="n">78%</td><td>cut cost only &mdash; quality is identical either way</td></tr>
+            <tr><td>Both wrong</td><td class="n">1</td><td class="n">3%</td><td>nothing</td></tr>
+            <tr class="hl"><td><b>Only Opus right</b></td><td class="n"><b>5</b></td><td class="n"><b>14%</b></td><td><b>the tasks it must catch</b> &mdash; h01, h05, h12, m05, m09</td></tr>
+            <tr class="hl"><td><b>Only Haiku right</b></td><td class="n"><b>2</b></td><td class="n"><b>6%</b></td><td>the expensive model was simply wrong &mdash; e09, m03</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="body">
+        <p class="note">
+          <strong>81% agreement.</strong> A perfect dispatcher and a coin produce the same answer on
+          four requests in five. Everything router research argues about lives in the remaining 19%
+          &mdash; and a fifth of <em>that</em> runs backwards, where the cheap model is right and the
+          expensive one is not.
+        </p>
+      </div>
+    </div>
+
+    <div class="takeaway">
+      <p><strong>Do this first.</strong> Run both models over ~200 real requests and count
+      disagreements. It costs a few dollars, takes an afternoon, and tells you the ceiling before
+      you write a line of routing logic.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================== 02 -->
+  <section>
+    <span class="num">02 / THE RESULT</span>
+    <h2>Cost is exact. Quality is a rumour.</h2>
+    <p class="lede">
+      Every dispatcher is charged for its own decision. The classifier pays for the tokens it spends
+      choosing; the cascade pays for the cheap answer it discards and for the verification call it
+      makes on every request.
+    </p>
+
+    <div class="evidence">
+      <header>
+        <span class="grade exact">Measured</span>
+        <span class="what">555 live calls &middot; $0.2572 total spend &middot; accuracy shown with 95% CI</span>
+      </header>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th>Strategy</th><th>%&nbsp;to&nbsp;high</th><th>Accuracy</th><th>95% CI</th><th>Cost</th><th>vs always-high</th><th>Overhead</th></tr>
+          </thead>
+          <tbody>
+            <tr class="dim"><td>always: Haiku</td><td class="n">0%</td><td class="n">83.3%</td><td class="n">71&ndash;96%</td><td class="n">$0.0041</td><td class="n up">&minus;88.0%</td><td class="n">0%</td></tr>
+            <tr class="hl"><td><b>cascade</b> <span style="color:var(--muted)">verify then escalate</span></td><td class="n">14%</td><td class="n"><b>97.2%</b></td><td class="n">92&ndash;100%</td><td class="n"><b>$0.0140</b></td><td class="n up"><b>&minus;59.0%</b></td><td class="n">31.9%</td></tr>
+            <tr><td>heuristic <span style="color:var(--muted)">0 tokens</span></td><td class="n">58%</td><td class="n">97.2%</td><td class="n">92&ndash;100%</td><td class="n">$0.0224</td><td class="n up">&minus;34.3%</td><td class="n">0%</td></tr>
+            <tr><td>lexical <span style="color:var(--muted)">TF-IDF</span></td><td class="n">58%</td><td class="n">86.1%</td><td class="n">75&ndash;97%</td><td class="n">$0.0236</td><td class="n up">&minus;30.7%</td><td class="n">0%</td></tr>
+            <tr><td>LLM classifier <span style="color:var(--muted)">Haiku</span></td><td class="n">67%</td><td class="n">94.4%</td><td class="n">87&ndash;100%</td><td class="n">$0.0281</td><td class="n">&minus;17.5%</td><td class="n down">18.1%</td></tr>
+            <tr class="dim"><td>always: Opus</td><td class="n">100%</td><td class="n">91.7%</td><td class="n">83&ndash;100%</td><td class="n">$0.0340</td><td class="n">&mdash;</td><td class="n">0%</td></tr>
+            <tr class="dim"><td>oracle <span style="color:var(--muted)">unbuildable</span></td><td class="n">22%</td><td class="n">94.4%</td><td class="n">87&ndash;100%</td><td class="n">$0.0141</td><td class="n up">&minus;58.6%</td><td class="n">0%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="body">
+        <p class="note">
+          Look at the CI column, not the accuracy column. <strong>Every interval overlaps every
+          other interval.</strong> The cost column has no error bars at all &mdash; it is arithmetic
+          over billed tokens.
+        </p>
+      </div>
+    </div>
+
+    <div class="evidence">
+      <header>
+        <span class="grade exact">Measured</span>
+        <span class="what">cost is a point; accuracy is a range</span>
+      </header>
+      <div class="body scroll">
+        <figure>
+          <svg viewBox="0 0 720 340" role="img" aria-label="Cost against accuracy for each strategy, with 95% confidence interval whiskers that all overlap.">
+            <line class="axis" x1="58" y1="298" x2="570" y2="298"></line>
+            <line class="axis" x1="58" y1="22" x2="58" y2="298"></line>
+            <line class="gridline" x1="58" y1="214.4" x2="570" y2="214.4"></line>
+            <line class="gridline" x1="58" y1="130.7" x2="570" y2="130.7"></line>
+            <line class="gridline" x1="58" y1="47.1" x2="570" y2="47.1"></line>
+
+            <text class="tick" x="50" y="302" text-anchor="end">70%</text>
+            <text class="tick" x="50" y="218" text-anchor="end">80%</text>
+            <text class="tick" x="50" y="134" text-anchor="end">90%</text>
+            <text class="tick" x="50" y="51" text-anchor="end">100%</text>
+            <text class="tick" x="58" y="316" text-anchor="middle">$0</text>
+            <text class="tick" x="200" y="316" text-anchor="middle">$0.010</text>
+            <text class="tick" x="342" y="316" text-anchor="middle">$0.020</text>
+            <text class="tick" x="485" y="316" text-anchor="middle">$0.030</text>
+            <text class="tick" x="300" y="332" text-anchor="middle">COST FOR 36 TASKS &rarr;</text>
+
+            <g stroke="var(--muted)" stroke-width="1.5" opacity=".55">
+              <line x1="116.0" y1="288.3" x2="116.0" y2="84.7"></line>
+              <line x1="256.5" y1="115.2" x2="256.5" y2="47.1"></line>
+              <line x1="258.6" y1="156.1" x2="258.6" y2="47.1"></line>
+              <line x1="375.9" y1="115.2" x2="375.9" y2="47.1"></line>
+              <line x1="393.3" y1="257.7" x2="393.3" y2="68.8"></line>
+              <line x1="457.2" y1="156.1" x2="457.2" y2="47.1"></line>
+              <line x1="542.0" y1="192.3" x2="542.0" y2="47.1"></line>
+            </g>
+
+            <circle cx="116.0" cy="186.5" r="5" fill="var(--muted)"></circle>
+            <text class="pointlabel" x="127" y="190">always: Haiku</text>
+            <circle cx="256.5" cy="70.3" r="6.5" fill="var(--saved)"></circle>
+            <text class="pointlabel" x="268" y="66" fill="var(--saved)" style="font-weight:700">cascade</text>
+            <circle cx="258.6" cy="93.6" r="4.5" fill="var(--muted)"></circle>
+            <text class="pointlabel" x="268" y="100">oracle</text>
+            <circle cx="375.9" cy="70.3" r="5.5" fill="var(--accent)"></circle>
+            <text class="pointlabel" x="387" y="68" fill="var(--accent)">heuristic</text>
+            <circle cx="393.3" cy="163.3" r="4.5" fill="var(--muted)"></circle>
+            <text class="pointlabel" x="404" y="167">lexical</text>
+            <circle cx="457.2" cy="93.6" r="4.5" fill="var(--spend)"></circle>
+            <text class="pointlabel" x="468" y="98" fill="var(--spend)">LLM classifier</text>
+            <circle cx="542.0" cy="116.8" r="5" fill="var(--muted)"></circle>
+            <text class="pointlabel" x="553" y="121">always: Opus</text>
+          </svg>
+        </figure>
+        <p class="note" style="min-width:520px">
+          Read it left to right, not top to bottom. Horizontal position is known precisely; vertical
+          position is a guess with a 20-point range.
+        </p>
+      </div>
+    </div>
+
+    <div class="takeaway">
+      <p><strong>Takeaway.</strong> The defensible claim is <em>&ldquo;59% cheaper with no detected
+      quality regression&rdquo;</em>. Anything stronger than that, this data cannot support.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================== 03 -->
+  <section>
+    <span class="num">03 / THE STATISTICS</span>
+    <h2>Nothing here is significant, including the premise</h2>
+    <p class="lede">
+      Because the same tasks run through every strategy, the right test is paired: McNemar on the
+      tasks where two strategies disagree. Only those carry information &mdash; and there are
+      almost none.
+    </p>
+
+    <div class="evidence">
+      <header>
+        <span class="grade exact">Measured</span>
+        <span class="what">exact binomial McNemar on paired per-task correctness</span>
+      </header>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Comparison</th><th>A wins</th><th>B wins</th><th>p</th><th>Conclusion</th></tr></thead>
+          <tbody>
+            <tr class="hl"><td><b>always-Opus vs always-Haiku</b></td><td class="n">5</td><td class="n">2</td><td class="n">0.453</td><td><b>the high model is not measurably better</b></td></tr>
+            <tr><td>cascade vs always-Opus</td><td class="n">3</td><td class="n">1</td><td class="n">0.625</td><td>no detectable difference</td></tr>
+            <tr><td>heuristic vs always-Opus</td><td class="n">2</td><td class="n">0</td><td class="n">0.500</td><td>no detectable difference</td></tr>
+            <tr><td>cascade vs always-Haiku</td><td class="n">5</td><td class="n">0</td><td class="n">0.062</td><td>no detectable difference</td></tr>
+            <tr><td>cascade vs heuristic</td><td class="n">1</td><td class="n">1</td><td class="n">1.000</td><td>no detectable difference</td></tr>
+            <tr><td>LLM classifier vs always-Opus</td><td class="n">1</td><td class="n">0</td><td class="n">1.000</td><td>no detectable difference</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="cols">
+      <div class="card">
+        <h4>To resolve a 5-point difference</h4>
+        <span class="stat" style="color:var(--spend)">~584</span>
+        <p>tasks, at this 19% disagreement rate, 80% power. We ran 36.</p>
+      </div>
+      <div class="card">
+        <h4>To resolve a 2-point difference</h4>
+        <span class="stat" style="color:var(--spend)">~3,712</span>
+        <p>tasks. Vendor pages quote differences this size routinely.</p>
+      </div>
+      <div class="card">
+        <h4>Resolution limit at n=36</h4>
+        <span class="stat">~14pp</span>
+        <p>Anything smaller is indistinguishable from sampling noise.</p>
+      </div>
+    </div>
+
+    <div class="takeaway">
+      <p><strong>Takeaway.</strong> A 36-task suite shows mechanism and measures cost. It cannot
+      rank routers, and neither can the eval most teams build before shipping one. If you are going
+      to make a quality claim, budget for several hundred labelled tasks first.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================== 04 -->
+  <section>
+    <span class="num">04 / WHICH DISPATCHER</span>
+    <h2>Decide after the cheap answer, not before it</h2>
+    <p class="lede">
+      The pre-request routers all converge on the same failure: when unsure, send it to the
+      expensive model. Two of them pushed 58% of traffic to Opus and kept only a third of the
+      saving. The cascade routes on evidence instead of prediction.
+    </p>
+
+    <div class="cols">
+      <div class="card">
+        <h4>Cascade &mdash; post-hoc</h4>
+        <span class="stat" style="color:var(--saved)">&minus;59%</span>
+        <p>Answer cheap, verify, escalate on doubt. Sent only <b>14%</b> to Opus. Pays for the
+        discarded answer and a verification call on every request &mdash; 31.9% of its budget bought
+        no answer &mdash; and still won on cost by a wide margin.</p>
+      </div>
+      <div class="card">
+        <h4>Heuristic &mdash; ex-ante, free</h4>
+        <span class="stat" style="color:var(--accent)">&minus;34%</span>
+        <p>Seven regex signals, zero tokens, sub-millisecond. Best of the pre-request routers, and
+        the one you can read in a code review.</p>
+      </div>
+      <div class="card">
+        <h4>LLM classifier &mdash; ex-ante, paid</h4>
+        <span class="stat" style="color:var(--spend)">&minus;18%</span>
+        <p>Spends <b>18.1%</b> of its own budget deciding, then sends 67% to Opus anyway. The worst
+        deal on the board: most of the cost of always-Opus, none of the simplicity.</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <span class="grade exact">Measured</span>
+      <p>
+        <strong>The lexical router scored worse than a coin</strong> flipping at its own rate
+        (&minus;1.2% accuracy for +$0.005). It routed on surface word overlap, which correlates with
+        topic, not difficulty. A dispatcher that is not better than random is not a dispatcher.
+      </p>
+    </div>
+
+    <div class="takeaway">
+      <p><strong>Why post-hoc wins.</strong> Routing needs a good prediction of quality
+      <em>before</em> spending anything; cascading needs a judgement of quality <em>after</em> one
+      cheap answer exists. The second problem is much easier &mdash; and cheap answers are cheap.
+      Removing the verifier collapses the cascade straight back into always-Haiku, so the verifier
+      is the entire mechanism.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================== 05 -->
+  <section>
+    <span class="num">05 / WHAT BIT US</span>
+    <h2>Three failure modes we hit in 555 calls</h2>
+
+    <div class="cols">
+      <div class="card">
+        <h4>The high model refused an easy question</h4>
+        <p>Opus 5 returned <code>stop_reason: "refusal"</code>, category <code>cyber</code>, on:
+        <em>&ldquo;In POSIX shells, what exit code is returned when a command is not found?&rdquo;</em>
+        Haiku answered it fine. Empty content, zero billed output, and it grades as a wrong answer
+        unless you check. <b>Tier dispatch changes your refusal surface, not just your bill.</b></p>
+      </div>
+      <div class="card">
+        <h4>A token cap masquerading as a wrong answer</h4>
+        <p>Opus 5 thinks by default and <code>max_tokens</code> caps thinking <em>plus</em> text. Our
+        first run capped answers at 512 and truncated the expensive model into looking incompetent.
+        Raising the cap fixed it. Always separate <code>stop_reason</code> from correctness.</p>
+      </div>
+      <div class="card">
+        <h4>A router keyed on a spurious feature</h4>
+        <p>Our first heuristic scored on <em>&ldquo;answer with the number only&rdquo;</em> &mdash; a
+        phrase present at every difficulty. It routed 100% of traffic to Haiku and read perfectly
+        sensibly in review. Surface form is not difficulty.</p>
+      </div>
+    </div>
+
+    <div class="takeaway">
+      <p><strong>All three grade as &ldquo;the model got it wrong&rdquo;</strong> unless you
+      instrument for them specifically. Two of the three made the expensive model look worse than it
+      is, which is the direction that quietly justifies a bad routing decision.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================== 06 -->
+  <section>
+    <span class="num">06 / THE BIGGER LEVER</span>
+    <h2>Caching pays more than dispatch, and costs no quality</h2>
+    <p class="lede">
+      Dispatch trades quality risk for money. Prompt caching does not &mdash; same model, same
+      answers, smaller bill. On repeated-prefix workloads it also beats dispatch outright.
+    </p>
+
+    <div class="evidence">
+      <header>
+        <span class="grade exact">Exact arithmetic</span>
+        <span class="what">20-step agent loop &middot; 3k system prompt &middot; published rates</span>
+      </header>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Lever</th><th>Cost</th><th>Saving</th><th>Quality cost</th></tr></thead>
+          <tbody>
+            <tr><td>Route to Haiku, no caching</td><td class="n">$0.3000</td><td class="n up">80.0%</td><td class="down">yes &mdash; unmeasurable at our scale</td></tr>
+            <tr class="hl"><td><b>Caching + context editing</b></td><td class="n"><b>$0.3242</b></td><td class="n up"><b>78.4%</b></td><td>loses older tool results</td></tr>
+            <tr class="hl"><td><b>Prompt caching alone</b></td><td class="n"><b>$0.3922</b></td><td class="n up"><b>73.9%</b></td><td><b class="up">none</b></td></tr>
+            <tr><td>Batch API</td><td class="n">$0.7500</td><td class="n up">50.0%</td><td>none; up to 24h latency</td></tr>
+            <tr class="dim"><td>Do nothing</td><td class="n">$1.5000</td><td class="n">&mdash;</td><td>&mdash;</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="callout">
+      <span class="grade exact">Exact arithmetic</span>
+      <p>
+        <strong>Two facts that make dispatch and caching fight each other.</strong>
+        A model switch invalidates the prompt cache completely and has no escape hatch, because
+        caches are model-scoped. And the cache floor is not monotonic with price &mdash; Opus 5
+        caches from 512 tokens, <strong>Haiku 4.5 needs 4,096</strong>, so a 3k prompt caches on the
+        expensive model and <em>silently does not</em> on the cheap one.
+        Past <strong>step 37</strong> of a loop, cached Opus is cheaper than uncached Haiku outright.
+      </p>
+    </div>
+
+    <div class="takeaway">
+      <p><strong>Takeaway.</strong> Fix caching before you argue about model choice. It is the only
+      lever on the list with no quality risk to measure, and on long loops it beats dispatch anyway.</p>
+    </div>
+  </section>
+
+
+  <!-- ============================================================== 07 -->
+  <section>
+    <span class="num">07 / WHAT WE SHIPPED</span>
+    <h2>The dispatcher, running</h2>
+    <p class="lede">
+      The measurement said a cascade is worth ~59%. So it exists now: an HTTP proxy that
+      speaks both the Anthropic and OpenAI dialects. Callers change <code>base_url</code>
+      and nothing else.
+    </p>
+
+    <div class="evidence">
+      <header>
+        <span class="grade exact">Verified live</span>
+        <span class="what">real models, real spend, both ingress formats</span>
+      </header>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Request</th><th>Dispatched to</th><th>Why</th><th>Cost</th></tr></thead>
+          <tbody>
+            <tr><td>caller asked for <code>claude-opus-5</code></td><td class="n">haiku</td><td>verifier accepted</td><td class="n up">$0.000135</td></tr>
+            <tr><td>Codex/OpenAI ingress</td><td class="n">haiku</td><td>verifier accepted</td><td class="n up">$0.000126</td></tr>
+            <tr class="hl"><td>consistency-guarantee question</td><td class="n"><b>opus</b></td><td><b>verifier said no &rarr; escalate</b></td><td class="n">$0.002428</td></tr>
+            <tr class="dim"><td>2nd turn, same session</td><td class="n">haiku</td><td>session affinity held the pin</td><td class="n">&mdash;</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="body">
+        <p class="note">
+          Every response carries a <code>dms_dispatch</code> block naming the model that
+          actually answered, the reason, per-leg spend, and the overhead. Without it you
+          cannot detect the silent regression.
+        </p>
+      </div>
+    </div>
+
+    <div class="cols">
+      <div class="card">
+        <h4>Streaming can't cascade</h4>
+        <p>The verifier needs the complete cheap answer, so a streamed cascade would buffer
+        everything and destroy time-to-first-token. Streaming falls back to the zero-token
+        heuristic. A real trade, not a gap.</p>
+      </div>
+      <div class="card">
+        <h4>Session affinity is on</h4>
+        <p>A model switch invalidates the prompt cache with no escape hatch. A reroute
+        forfeits the 0.10&times; read <em>and</em> re-pays the 1.25&times; write, so the
+        first decision sticks for an hour.</p>
+      </div>
+      <div class="card">
+        <h4>Then we pointed Codex at it</h4>
+        <p>Codex resends a <b>13,443-token</b> harness prompt every turn. Uncached: $0.069 a
+        turn, and the router sent it to Opus regardless because a 13k prompt trips every
+        length signal. Caching the prefix took the steady-state turn to <b>$0.0155</b> &mdash;
+        <b>78% off, no model change</b>. The first turn cost <em>more</em> ($0.0817, the
+        1.25&times; write premium); break-even is turn two.</p>
+      </div>
+      <div class="card">
+        <h4>A refusal retries the other tier</h4>
+        <p>When the high model refuses, the cheap answer already paid for is returned
+        rather than discarded. Measured: Opus refused a benign shell question Haiku
+        answered fine.</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <span class="grade exact">Observed in production shape</span>
+      <p>
+        <strong>It also failed live, exactly as measured.</strong> Asked an LRU-cache
+        question, Haiku answered <b>4</b>, the verifier accepted, and the correct answer is
+        <b>5</b>. That is the 67%-recall verifier miss, in the wild. The cascade is 59%
+        cheaper &mdash; it is not more accurate.
+      </p>
+    </div>
+
+    <div class="takeaway">
+      <p><strong>Takeaway.</strong> The router was an afternoon. The measurement that told
+      us which router, and the eval that would catch it regressing, are the actual project.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================== 08 -->
+  <section>
+    <span class="num">08 / THE ANSWER</span>
+    <h2>Worth building &mdash; for the cost, and only with an eval</h2>
+
+    <ol class="steps">
+      <li><strong>Measure your disagreement rate first.</strong> Both models over ~200 real
+        requests. If they agree 95% of the time, a dispatcher is a cost optimisation and nothing
+        more &mdash; scope it that way. Ours was 81%.</li>
+      <li><strong>Fix caching before dispatch.</strong> Bigger saving, no quality risk, and a
+        reroute forfeits the cache you just built.</li>
+      <li><strong>If you build one, build a cascade.</strong> Cheap answer, verify, escalate. 59%
+        cheaper than always-high here, decides on evidence rather than prediction, and degrades to
+        always-cheap rather than always-expensive when the verifier is weak.</li>
+      <li><strong>Do not build an LLM classifier.</strong> It was the most expensive dispatcher and
+        the least effective &mdash; 18% of its budget spent deciding, and it still sent two-thirds of
+        traffic to the expensive model.</li>
+      <li><strong>Budget for the eval, not the router.</strong> Several hundred labelled tasks to
+        detect a 5-point regression. The router is an afternoon; the eval is the project.</li>
+      <li><strong>Claim cost, not quality.</strong> &ldquo;59% cheaper with no detected regression&rdquo;
+        is defensible and useful. &ldquo;Cheaper and better&rdquo; is not, on any sample size a team
+        this size will actually build.</li>
+    </ol>
+
+    <div class="takeaway">
+      <p><strong>The one-line version.</strong> A high/low dispatcher is worth roughly a third to
+      a half off your bill, capped by a disagreement rate you can measure in an afternoon &mdash;
+      and the quality question is far harder to answer than the routing question.</p>
+    </div>
+  </section>
+
+  <footer>
+    <p>
+      <strong>How to read the badges.</strong>
+      <span class="grade exact">Measured</span> means it came from <code>response.usage</code> on a
+      live run &mdash; 555 calls, $0.2572 of real spend &mdash; or is arithmetic over published
+      per-token rates. Cost figures carry no sampling error; accuracy figures carry the confidence
+      intervals shown.
+      <span class="grade cite">Literature</span> marks someone else's published number.
+    </p>
+    <p style="margin-top:16px">
+      <strong>Known limits.</strong> 36 tasks, short-answer grading only, one workload, one run.
+      Model nondeterminism means the &ldquo;oracle&rdquo; row is not a strict upper bound &mdash; it
+      probes models sequentially and can lose a task another strategy happened to win. Everything is
+      reproducible: <code>uv run dms bench --two-tier</code>, <code>uv run dms levers</code>,
+      <code>uv run pytest</code> (133 tests).
+    </p>
+  </footer>
+
+</div>

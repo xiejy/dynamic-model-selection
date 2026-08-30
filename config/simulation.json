@@ -1,0 +1,37 @@
+{
+  "_README": [
+    "ASSUMPTIONS, NOT MEASUREMENTS. These drive `--mode simulate`, which exists so the",
+    "harness runs with no API credential. Every number produced from this file is an",
+    "estimate and is labelled `simulated` end to end.",
+    "",
+    "They are in a config file on purpose: change a row, rerun the bench, and see which",
+    "conclusions move. A conclusion that flips when Haiku's hard-task accuracy moves by",
+    "0.05 was never a conclusion. That sensitivity is a talk slide in its own right.",
+    "",
+    "Replace all of this with real data by running: --mode record (needs ANTHROPIC_API_KEY)."
+  ],
+
+  "chars_per_token": 3.6,
+  "_chars_per_token_note": "Rough Claude ratio for mixed English/code prose. Used ONLY for simulation and for the pre-flight spend guard. Real reported figures come from response.usage; count_tokens is the pre-flight endpoint. Never tiktoken -- it undercounts Claude by 15-20%, worse on code.",
+
+  "accuracy_by_model_and_difficulty": {
+    "_note": "P(correct) per model per tier. Shaped so the tiers actually differ -- if the cheap model matched the expensive one everywhere, routing would be trivially free and the demo would prove nothing. The gap widens with difficulty, which is the pattern every routing paper reports.",
+    "claude-haiku-4-5": { "easy": 0.97, "medium": 0.78, "hard": 0.42 },
+    "claude-sonnet-5":  { "easy": 0.99, "medium": 0.92, "hard": 0.68 },
+    "claude-opus-5":    { "easy": 0.99, "medium": 0.96, "hard": 0.86 }
+  },
+
+  "output_tokens_by_model": {
+    "_note": "Inclusive [min, max] range, sampled deterministically per prompt. Bigger models are assumed more verbose -- documented behaviour on Opus 5, whose default response text is longer than prior models and is trimmed by prompting, not by effort.",
+    "claude-haiku-4-5": [60, 180],
+    "claude-sonnet-5": [90, 260],
+    "claude-opus-5": [140, 420]
+  },
+
+  "latency_ms_by_model": {
+    "_note": "Wall-clock per call. Matters because router overhead has to be judged against it: a 50ms router is free next to a 2s call, but in a 30-step agent loop it is 1.5s of pure tax.",
+    "claude-haiku-4-5": [400, 1200],
+    "claude-sonnet-5": [700, 2200],
+    "claude-opus-5": [1200, 4500]
+  }
+}
