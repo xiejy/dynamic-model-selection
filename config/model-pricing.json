@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "_note": "Schema mirrors ~/workspace/.workspace/ai-metrics/config/model-pricing.json. Rates are decimal STRINGS so they parse into Decimal without binary-float error. Snapshots are ordered by effective_from and are immutable once written.",
+  "_note": "Schema mirrors an internal cost-tracking tool's price table. Rates are decimal STRINGS so they parse into Decimal without binary-float error. Snapshots are ordered by effective_from and are immutable once written.",
   "cache_multipliers": {
     "_note": "Uniform across Claude models. Applied to the model's input rate.",
     "read": "0.10",

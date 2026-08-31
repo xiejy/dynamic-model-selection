@@ -272,7 +272,7 @@ src/dms/metrics.py          PGR, random-baseline comparison, Pareto frontier
 Two deliberate choices worth noting:
 
 - **Money is `Decimal`, never `float`** — matching the approach in
-  `~/workspace/.workspace/ai-metrics/scripts/pricing.py`. Prices are decimal *strings* in
+  an internal cost-tracking tool that predates this repo. Prices are decimal *strings* in
   JSON and validated as such at load.
 - **Prices are dated snapshots**, because the Sonnet 5 introductory rate ($2/$10) lapses
   **2026-08-31** and reverts to $3/$15. A flat table silently under-reports every cost
@@ -442,7 +442,7 @@ With no key it exits 2 and says plainly that nothing was verified.
 ### Multi-provider
 
 GPT-5.x/Codex rates were mirrored into `config/model-pricing.json` from
-`~/workspace/.workspace/ai-metrics` snapshot `2026-07-31-a35a041dfafc`, so the two
+an internal cost-tracking tool's own price table, so the two
 tables agree by construction. The price book is provider-aware: OpenAI's explicit
 `cached_input_usd_per_million` is used where present rather than Anthropic's 0.10×
 multiplier, and OpenAI cache writes carry no premium. `prompt_tokens` includes cached

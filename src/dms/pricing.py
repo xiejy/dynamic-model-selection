@@ -3,7 +3,7 @@
 Two design choices worth defending in the talk:
 
 1. **Decimal, never float.** Money is decimal; binary floats drift. This mirrors
-   the approach already used in ~/workspace/.workspace/ai-metrics/scripts/pricing.py.
+   the approach already used in an internal cost-tracking tool that predates this repo.
 2. **Dated snapshots, not a flat table.** The Sonnet 5 introductory rate
    ($2/$10) lapses 2026-08-31 and reverts to $3/$15. A flat table silently
    under-reports every cost computed from September onward.
