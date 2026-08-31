@@ -1,13 +1,13 @@
 {
   "model": "claude-haiku-4-5",
-  "text": "Missing 'user_id' key in payload",
+  "text": "Missing key in dictionary payload.",
   "usage": {
     "input_tokens": 80,
-    "output_tokens": 13,
+    "output_tokens": 9,
     "cache_creation_input_tokens": 0,
     "cache_read_input_tokens": 0
   },
-  "latency_ms": 1899.071,
+  "latency_ms": 1044.261,
   "simulated": false,
   "stop_reason": "end_turn",
   "refusal_category": ""

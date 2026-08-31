@@ -1,13 +1,13 @@
 {
   "model": "claude-haiku-4-5",
-  "text": "yes",
+  "text": "Yes",
   "usage": {
     "input_tokens": 63,
     "output_tokens": 4,
     "cache_creation_input_tokens": 0,
     "cache_read_input_tokens": 0
   },
-  "latency_ms": 872.224,
+  "latency_ms": 870.532,
   "simulated": false,
   "stop_reason": "end_turn",
   "refusal_category": ""

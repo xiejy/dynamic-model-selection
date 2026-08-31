@@ -7,7 +7,7 @@
     "cache_creation_input_tokens": 0,
     "cache_read_input_tokens": 0
   },
-  "latency_ms": 1087.51,
+  "latency_ms": 922.537,
   "simulated": false,
   "stop_reason": "max_tokens",
   "refusal_category": ""

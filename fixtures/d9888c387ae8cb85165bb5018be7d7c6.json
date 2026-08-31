@@ -1,13 +1,13 @@
 {
   "model": "claude-haiku-4-5",
-  "text": "Late binding of closure variable.",
+  "text": "Late binding of closure variables",
   "usage": {
     "input_tokens": 103,
-    "output_tokens": 9,
+    "output_tokens": 8,
     "cache_creation_input_tokens": 0,
     "cache_read_input_tokens": 0
   },
-  "latency_ms": 1031.697,
+  "latency_ms": 1058.818,
   "simulated": false,
   "stop_reason": "end_turn",
   "refusal_category": ""

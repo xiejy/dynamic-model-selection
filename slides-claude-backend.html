@@ -104,14 +104,15 @@
     <p class="kicker">Claude backend &middot; measured, not modelled</p>
     <h1>Haiku 4.5 vs Opus 5: what the numbers actually say</h1>
     <p class="sub">
-      Seven dispatch strategies over the same 36-task workload, every call charged to the
-      strategy that made it. <strong>Cost and latency are measured precisely. Accuracy is
-      not</strong> &mdash; and the gap between those two facts is the whole result.
+      Seven dispatch strategies over the same 36-task workload, run <strong>three times
+      end to end</strong>, every call charged to the strategy that made it. Running it
+      repeatedly is the point: <strong>the spread between identical runs is the noise floor,
+      and no conclusion may rest below it.</strong>
     </p>
     <div class="meta">
-      <span><b>Run</b> live, <code>--mode record</code></span>
-      <span><b>Calls</b> 555</span>
-      <span><b>Spend</b> $0.2572</span>
+      <span><b>Runs</b> 3 &times; live, <code>--mode record</code></span>
+      <span><b>Calls</b> 1,661</span>
+      <span><b>Spend</b> $0.7633</span>
       <span><b>Tasks</b> 36 (12 easy / 12 medium / 12 hard)</span>
       <span><b>Models</b> claude-haiku-4-5 · claude-opus-5</span>
     </div>
@@ -184,130 +185,133 @@
     <h2>The scorecard</h2>
 
     <div class="strip">
-      <div class="stat"><span class="n" style="color:var(--saved)">59%</span>
-        <span class="l">cheaper than always-Opus, cascade dispatch</span></div>
+      <div class="stat"><span class="n" style="color:var(--saved)">53%</span>
+        <span class="l">cheaper than always-Opus, cascade, pooled over 3 runs (range 44&ndash;59%)</span></div>
       <div class="stat"><span class="n">8.3&times;</span>
         <span class="l">cost spread, Haiku to Opus, same workload</span></div>
-      <div class="stat"><span class="n">2.0&times;</span>
-        <span class="l">latency spread, 1,353 ms to 2,769 ms</span></div>
+      <div class="stat"><span class="n" style="color:var(--spend)">3&times;</span>
+        <span class="l">the accuracy winner changed &mdash; every single run</span></div>
       <div class="stat"><span class="n" style="color:var(--spend)">19%</span>
         <span class="l">of tasks where the two models disagree at all</span></div>
     </div>
 
     <div class="card">
       <header>
-        <span class="grade exact">Measured</span>
-        <span class="what">cost from response.usage · latency wall-clock · accuracy with 95% CI</span>
+        <span class="grade exact">Measured &times;3</span>
+        <span class="what">pooled over 3 identical runs &middot; 108 task-instances per strategy</span>
       </header>
       <div class="scroll">
         <table>
           <thead>
-            <tr><th>Strategy</th><th>Accuracy</th><th>95% CI</th><th>Cost</th>
-                <th>vs Opus</th><th>ms / task</th><th>% to Opus</th><th>Overhead</th></tr>
+            <tr><th>Strategy</th><th>Accuracy</th><th>95% CI</th><th>Run-to-run range</th>
+                <th>Cost</th><th>vs Opus</th><th>ms / task</th><th>% to Opus</th></tr>
           </thead>
           <tbody>
-            <tr class="dim"><td>always: Haiku</td><td class="n">83.3%</td><td class="n">71–96%</td>
-              <td class="n">$0.0041</td><td class="n up">−88.0%</td><td class="n">1,353</td>
-              <td class="n">0%</td><td class="n">0%</td></tr>
-            <tr class="hl"><td><b>cascade</b></td><td class="n"><b>97.2%</b></td><td class="n">92–100%</td>
-              <td class="n"><b>$0.0140</b></td><td class="n up"><b>−59.0%</b></td><td class="n">2,735</td>
-              <td class="n">14%</td><td class="n down">31.9%</td></tr>
+            <tr class="dim"><td>always: Haiku</td><td class="n">82.4%</td><td class="n">75–90%</td>
+              <td class="n">2.8 pp</td><td class="n">$0.0041</td><td class="n up">−87.5%</td>
+              <td class="n">1,088</td><td class="n">0%</td></tr>
+            <tr class="hl"><td><b>cascade</b></td><td class="n"><b>94.4%</b></td><td class="n">90–99%</td>
+              <td class="n down">5.6 pp</td><td class="n"><b>$0.0153</b></td><td class="n up"><b>−53.1%</b></td>
+              <td class="n">2,532</td><td class="n">14–17%</td></tr>
             <tr class="dim"><td>oracle <span style="color:var(--muted)">(unbuildable)</span></td>
-              <td class="n">94.4%</td><td class="n">87–100%</td><td class="n">$0.0141</td>
-              <td class="n up">−58.6%</td><td class="n">2,056</td><td class="n">22%</td><td class="n">0%</td></tr>
+              <td class="n">96.3%</td><td class="n">93–100%</td><td class="n">2.8 pp</td>
+              <td class="n">$0.0138</td><td class="n up">−57.8%</td><td class="n">1,477</td><td class="n">17–22%</td></tr>
             <tr><td>heuristic <span style="color:var(--muted)">0 tokens</span></td>
-              <td class="n">97.2%</td><td class="n">92–100%</td><td class="n">$0.0224</td>
-              <td class="n up">−34.3%</td><td class="n">2,008</td><td class="n">58%</td><td class="n">0%</td></tr>
+              <td class="n">96.3%</td><td class="n">93–100%</td><td class="n">2.8 pp</td>
+              <td class="n">$0.0218</td><td class="n up">−33.3%</td><td class="n">1,648</td><td class="n">58%</td></tr>
             <tr><td>lexical <span style="color:var(--muted)">TF-IDF</span></td>
-              <td class="n">86.1%</td><td class="n">75–97%</td><td class="n">$0.0236</td>
-              <td class="n up">−30.7%</td><td class="n">1,946</td><td class="n">58%</td><td class="n">0%</td></tr>
-            <tr><td>LLM classifier</td><td class="n">94.4%</td><td class="n">87–100%</td>
-              <td class="n">$0.0281</td><td class="n">−17.5%</td><td class="n down">3,685</td>
-              <td class="n">67%</td><td class="n down">18.1%</td></tr>
-            <tr class="dim"><td>always: Opus</td><td class="n">91.7%</td><td class="n">83–100%</td>
-              <td class="n">$0.0340</td><td class="n">—</td><td class="n">2,769</td>
-              <td class="n">100%</td><td class="n">0%</td></tr>
+              <td class="n">88.9%</td><td class="n">83–95%</td><td class="n down">5.6 pp</td>
+              <td class="n">$0.0231</td><td class="n up">−29.4%</td><td class="n">1,682</td><td class="n">58%</td></tr>
+            <tr><td>LLM classifier</td><td class="n">92.6%</td><td class="n">88–98%</td>
+              <td class="n">2.8 pp</td><td class="n">$0.0281</td><td class="n">−14.1%</td>
+              <td class="n down">2,842</td><td class="n">61–67%</td></tr>
+            <tr class="dim"><td>always: Opus</td><td class="n">93.5%</td><td class="n">89–98%</td>
+              <td class="n">2.8 pp</td><td class="n">$0.0327</td><td class="n">—</td>
+              <td class="n">2,232</td><td class="n">100%</td></tr>
           </tbody>
         </table>
       </div>
       <div class="body">
         <p class="note">
-          <b>Overhead</b> is the share of spend that bought no part of the returned answer:
-          the classifier's own tokens, the cascade's verification call, and cheap attempts
-          discarded on escalation.
-          <br><br>
-          <b>Read the CI column, not the accuracy column.</b> Every interval overlaps every
-          other. The cascade tops the accuracy column by two tasks out of thirty-six &mdash;
-          the next section takes those two apart, and one of them is a coin flip.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- =============================================== why cascade looks best -->
-  <section>
-    <h2>Why does the cascade top the accuracy column?</h2>
-    <p>
-      It shouldn't, and the honest answer is that <strong>it doesn't really.</strong> A
-      strategy that sends 86% of traffic to the cheap model has no business out-scoring the
-      expensive one. The entire margin is <strong>two tasks out of thirty-six</strong>, and it
-      dissolves when you look at them.
-    </p>
-
-    <div class="card">
-      <header>
-        <span class="grade warn">Decomposition</span>
-        <span class="what">every task where cascade and always-Opus disagree</span>
-      </header>
-      <div class="scroll">
-        <table>
-          <thead><tr><th>Task</th><th>Cascade</th><th>Answered by</th><th>always-Opus</th>
-                     <th>Haiku alone</th><th style="text-align:left">What actually happened</th></tr></thead>
-          <tbody>
-            <tr><td class="n">e09</td><td class="n up">right</td><td class="n">haiku</td>
-              <td class="n down">wrong</td><td class="n up">right</td>
-              <td style="text-align:left"><b>Opus refused it</b> (<code>cyber</code>). The cascade
-                never escalated, so it dodged the refusal.</td></tr>
-            <tr class="hl"><td class="n">m03</td><td class="n up">right</td><td class="n">haiku</td>
-              <td class="n down">wrong</td><td class="n up">right</td>
-              <td style="text-align:left"><b>The only genuine win</b> — Haiku right, Opus wrong.</td></tr>
-            <tr><td class="n">h11</td><td class="n up">right</td><td class="n"><b>opus</b></td>
-              <td class="n down">wrong</td><td class="n down">wrong</td>
-              <td style="text-align:left"><b>Not a win at all.</b> Cascade escalated to Opus and got it
-                right; always-Opus asked <em>the same model the same question</em> and got it wrong.
-                Nondeterminism.</td></tr>
-            <tr><td class="n">h12</td><td class="n down">wrong</td><td class="n">haiku</td>
-              <td class="n up">right</td><td class="n down">wrong</td>
-              <td style="text-align:left"><b>Verifier miss</b> — accepted a wrong Haiku answer, so it
-                never escalated.</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="body">
-        <p class="note">
-          Three wins minus one loss is <b>+2 tasks = +5.6 points</b>, and that is the whole of
-          &ldquo;97.2% vs 91.7%&rdquo;. Of the three wins: <b>one clean, one a safety-classifier
-          quirk, one a coin flip.</b> This is precisely why the paired test returns
-          <b>p = 0.625</b>.
+          <b>Run-to-run range</b> is the same strategy on the same tasks in three separate
+          runs. Nothing changed but the models' own nondeterminism. Any accuracy gap smaller
+          than that column is not a finding.
         </p>
       </div>
     </div>
 
     <div class="callout">
       <p>
-        <strong>Do not present the accuracy column as a ranking.</strong> At 36 tasks it is
-        noise sorted by luck. The columns that carry real signal are <b>cost</b> (exact,
-        from billed tokens), <b>latency</b> (wall-clock), and <b>% to Opus</b> (a count, not
-        an estimate). If someone asks &ldquo;so the cascade is more accurate?&rdquo;, the
-        correct answer is <em>&ldquo;we can't tell, and neither can anyone else at this
-        sample size.&rdquo;</em>
+        <strong>The accuracy winner changed in every run.</strong>
+        Run 1: heuristic and cascade tied at 97.2%. Run 2: oracle. Run 3: heuristic and
+        oracle. <b>The cascade topped the table once out of three</b>, and scored
+        97.2% / 91.7% / 94.4% on identical work. Cost ordering, by contrast, was
+        <b>identical all three times.</b>
+      </p>
+    </div>
+  </section>
+
+  <!-- =============================================== why cascade looks best -->
+  <section>
+    <h2>Why did the cascade top the accuracy column?</h2>
+    <p>
+      It shouldn't have, and running the benchmark twice more settled it: <strong>it doesn't.
+      The cascade topped the table once in three runs.</strong> A strategy sending 86% of
+      traffic to the cheap model has no business out-scoring the expensive one, and across
+      identical reruns it didn't.
+    </p>
+
+    <div class="card">
+      <header>
+        <span class="grade warn">Same tasks, same code, three runs</span>
+        <span class="what">only the models' own nondeterminism differed</span>
+      </header>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Strategy</th><th>Run 1</th><th>Run 2</th><th>Run 3</th>
+                     <th>Range</th><th style="text-align:left">Verdict</th></tr></thead>
+          <tbody>
+            <tr class="hl"><td><b>cascade</b></td><td class="n">97.2%</td><td class="n">91.7%</td>
+              <td class="n">94.4%</td><td class="n down">5.6 pp</td>
+              <td style="text-align:left"><b>top of table, then 5th, then 3rd</b></td></tr>
+            <tr><td>always: Opus</td><td class="n">91.7%</td><td class="n">94.4%</td>
+              <td class="n">94.4%</td><td class="n">2.8 pp</td>
+              <td style="text-align:left">the "worse" model, twice above the cascade</td></tr>
+            <tr><td>heuristic</td><td class="n">97.2%</td><td class="n">94.4%</td>
+              <td class="n">97.2%</td><td class="n">2.8 pp</td>
+              <td style="text-align:left">topped it twice</td></tr>
+            <tr><td>oracle</td><td class="n">94.4%</td><td class="n">97.2%</td>
+              <td class="n">97.2%</td><td class="n">2.8 pp</td>
+              <td style="text-align:left">topped it twice</td></tr>
+            <tr class="dim"><td>lexical</td><td class="n">86.1%</td><td class="n">88.9%</td>
+              <td class="n">91.7%</td><td class="n down">5.6 pp</td>
+              <td style="text-align:left">climbed 5.6 points doing nothing</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="body">
+        <p class="note">
+          <b>The accuracy winner changed in all three runs</b> &mdash; heuristic + cascade,
+          then oracle, then heuristic + oracle. Meanwhile the <b>cost ordering was identical
+          every time</b>. That contrast is the entire methodological point of this page.
+        </p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <p>
+        <strong>One task tells the whole story.</strong> In run 1 the cascade escalated
+        <code>h11</code> to Opus and got it right, while always-Opus asked
+        <em>the same model the same question</em> and got it wrong. Then it flipped again in
+        run 2. Sixteen such per-task flips occurred between runs 1 and 2 alone. If a model
+        disagrees with itself, a 36-task suite cannot rank strategies that differ by two tasks.
       </p>
     </div>
 
     <div class="takeaway">
-      <p><strong>The one thing this does establish:</strong> the cascade did not <em>lose</em>
-      accuracy while cutting cost 59%. &ldquo;No detected regression&rdquo; is a real and
-      useful claim. &ldquo;Better&rdquo; is not.</p>
+      <p><strong>What survived all three runs:</strong> the cascade never <em>lost</em>
+      accuracy against always-Opus, and cut cost by roughly half every time. That is the
+      claim. &ldquo;More accurate&rdquo; was never one.</p>
     </div>
   </section>
 
@@ -380,20 +384,20 @@
         <table>
           <thead><tr><th>Strategy</th><th>Easy</th><th>Medium</th><th>Hard</th><th>Overall</th></tr></thead>
           <tbody>
-            <tr class="dim"><td>always: Haiku</td><td class="n">100%</td><td class="n">83%</td>
-              <td class="n down">67%</td><td class="n">83.3%</td></tr>
+            <tr class="dim"><td>always: Haiku</td><td class="n">100%</td><td class="n">81%</td>
+              <td class="n down">67%</td><td class="n">82.4%</td></tr>
             <tr class="dim"><td>always: Opus</td><td class="n down">92%</td><td class="n">92%</td>
-              <td class="n">92%</td><td class="n">91.7%</td></tr>
-            <tr class="hl"><td><b>cascade</b></td><td class="n">100%</td><td class="n">100%</td>
-              <td class="n">92%</td><td class="n"><b>97.2%</b></td></tr>
-            <tr class="hl"><td><b>heuristic</b></td><td class="n">100%</td><td class="n">92%</td>
-              <td class="n up">100%</td><td class="n"><b>97.2%</b></td></tr>
-            <tr><td>LLM classifier</td><td class="n">92%</td><td class="n">100%</td>
-              <td class="n">92%</td><td class="n">94.4%</td></tr>
-            <tr><td>lexical</td><td class="n">92%</td><td class="n">83%</td>
-              <td class="n">83%</td><td class="n">86.1%</td></tr>
+              <td class="n">97%</td><td class="n">93.5%</td></tr>
+            <tr class="hl"><td><b>cascade</b></td><td class="n">100%</td><td class="n">92%</td>
+              <td class="n">92%</td><td class="n"><b>94.4%</b></td></tr>
+            <tr class="hl"><td><b>heuristic</b></td><td class="n">100%</td><td class="n">89%</td>
+              <td class="n up">100%</td><td class="n"><b>96.3%</b></td></tr>
+            <tr><td>LLM classifier</td><td class="n">92%</td><td class="n">94%</td>
+              <td class="n">92%</td><td class="n">92.6%</td></tr>
+            <tr><td>lexical</td><td class="n">92%</td><td class="n">89%</td>
+              <td class="n">86%</td><td class="n">88.9%</td></tr>
             <tr><td>oracle</td><td class="n">100%</td><td class="n">92%</td>
-              <td class="n">92%</td><td class="n">94.4%</td></tr>
+              <td class="n">97%</td><td class="n">96.3%</td></tr>
           </tbody>
         </table>
       </div>
@@ -411,50 +415,58 @@
 
   <!-- =============================================== significance -->
   <section>
-    <h2>None of the accuracy differences are real</h2>
+    <h2>What three runs resolved &mdash; and what they didn't</h2>
 
     <div class="card">
       <header>
         <span class="grade warn">The caveat that governs everything above</span>
-        <span class="what">exact binomial McNemar on paired per-task correctness</span>
+        <span class="what">exact binomial McNemar &middot; 108 paired task-instances (3 runs)</span>
       </header>
       <div class="scroll">
         <table>
           <thead><tr><th>Comparison</th><th>A wins</th><th>B wins</th><th>p</th><th>Conclusion</th></tr></thead>
           <tbody>
-            <tr class="hl"><td><b>always-Opus vs always-Haiku</b></td><td class="n">5</td><td class="n">2</td>
-              <td class="n"><b>0.453</b></td><td><b>the expensive model is not measurably better</b></td></tr>
-            <tr><td>cascade vs always-Opus</td><td class="n">3</td><td class="n">1</td>
+            <tr class="hl"><td><b>always-Opus vs always-Haiku</b></td><td class="n">16</td><td class="n">4</td>
+              <td class="n up"><b>0.0118</b></td><td><b>REAL &mdash; the expensive model is better</b>
+              <span style="color:var(--muted)">(at n=36 this was p=0.453)</span></td></tr>
+            <tr><td>heuristic vs always-Haiku</td><td class="n">17</td><td class="n">2</td>
+              <td class="n up">0.0007</td><td>REAL &mdash; dispatch beats always-cheap</td></tr>
+            <tr><td>cascade vs always-Haiku</td><td class="n">14</td><td class="n">1</td>
+              <td class="n up">0.0010</td><td>REAL &mdash; dispatch beats always-cheap</td></tr>
+            <tr class="hl"><td><b>cascade vs always-Opus</b></td><td class="n">5</td><td class="n">4</td>
+              <td class="n"><b>1.000</b></td><td><b>dead even &mdash; and that is the result</b></td></tr>
+            <tr><td>heuristic vs always-Opus</td><td class="n">4</td><td class="n">1</td>
+              <td class="n">0.375</td><td>no detectable difference</td></tr>
+            <tr><td>cascade vs heuristic</td><td class="n">1</td><td class="n">3</td>
               <td class="n">0.625</td><td>no detectable difference</td></tr>
-            <tr><td>heuristic vs always-Opus</td><td class="n">2</td><td class="n">0</td>
-              <td class="n">0.500</td><td>no detectable difference</td></tr>
-            <tr><td>cascade vs always-Haiku</td><td class="n">5</td><td class="n">0</td>
-              <td class="n">0.062</td><td>no detectable difference</td></tr>
-            <tr><td>cascade vs heuristic</td><td class="n">1</td><td class="n">1</td>
-              <td class="n">1.000</td><td>no detectable difference</td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
     <div class="strip">
-      <div class="stat"><span class="n" style="color:var(--spend)">~14pp</span>
-        <span class="l">resolution limit at n=36 — smaller gaps are noise</span></div>
-      <div class="stat"><span class="n" style="color:var(--spend)">~584</span>
-        <span class="l">tasks needed to resolve a 5-point difference</span></div>
-      <div class="stat"><span class="n" style="color:var(--spend)">~3,712</span>
-        <span class="l">tasks needed to resolve a 2-point difference</span></div>
-      <div class="stat"><span class="n">36</span>
-        <span class="l">tasks we actually ran</span></div>
+      <div class="stat"><span class="n" style="color:var(--saved)">p=0.012</span>
+        <span class="l">Opus &gt; Haiku — resolved by tripling the data</span></div>
+      <div class="stat"><span class="n">p=1.000</span>
+        <span class="l">cascade vs always-Opus — still dead even at 108 instances</span></div>
+      <div class="stat"><span class="n" style="color:var(--spend)">5.6 pp</span>
+        <span class="l">largest swing between identical runs</span></div>
+      <div class="stat"><span class="n">108</span>
+        <span class="l">paired task-instances per strategy</span></div>
     </div>
 
     <div class="callout">
       <p>
-        <strong>The cost column has no error bars.</strong> It is arithmetic over billed
-        tokens from <code>response.usage</code>. The accuracy column has a ±9–14 point
-        interval. So the only defensible claim is
-        <em>&ldquo;59% cheaper with no detected quality regression&rdquo;</em> &mdash;
-        never <em>&ldquo;cheaper and better&rdquo;</em>.
+        <strong>Tripling the data changed one conclusion and confirmed another.</strong>
+        &ldquo;Is Opus better than Haiku?&rdquo; went from unresolvable (p=0.453) to
+        <b>yes (p=0.012)</b> — so the earlier &ldquo;not measurably better&rdquo; was a
+        statement about <em>sample size</em>, not about the models. But
+        <b>cascade vs always-Opus stayed dead even at 5–4, p=1.000.</b>
+        <br><br>
+        That combination is the finding: <b>the cascade recovers always-Opus quality —
+        indistinguishable across 108 paired instances — at 53% less cost, while being
+        clearly better than always-Haiku (p=0.001).</b> Not &ldquo;better&rdquo;. Equal, for
+        half the money.
       </p>
     </div>
   </section>

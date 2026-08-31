@@ -3,11 +3,11 @@
   "text": "Yes",
   "usage": {
     "input_tokens": 97,
-    "output_tokens": 37,
+    "output_tokens": 5,
     "cache_creation_input_tokens": 0,
     "cache_read_input_tokens": 0
   },
-  "latency_ms": 2848.857,
+  "latency_ms": 1650.445,
   "simulated": false,
   "stop_reason": "end_turn",
   "refusal_category": ""

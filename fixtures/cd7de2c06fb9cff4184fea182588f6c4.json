@@ -1,13 +1,13 @@
 {
   "model": "claude-opus-5",
-  "text": "412",
+  "text": "409",
   "usage": {
     "input_tokens": 107,
     "output_tokens": 3,
     "cache_creation_input_tokens": 0,
     "cache_read_input_tokens": 0
   },
-  "latency_ms": 2849.32,
+  "latency_ms": 1761.047,
   "simulated": false,
   "stop_reason": "end_turn",
   "refusal_category": ""

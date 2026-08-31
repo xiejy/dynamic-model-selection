@@ -1,13 +1,13 @@
 {
   "model": "claude-haiku-4-5",
-  "text": "Copying application code invalidates the pip install layer cache.",
+  "text": "Any code change invalidates the layer cache, requiring pip reinstall.",
   "usage": {
     "input_tokens": 79,
-    "output_tokens": 15,
+    "output_tokens": 17,
     "cache_creation_input_tokens": 0,
     "cache_read_input_tokens": 0
   },
-  "latency_ms": 950.635,
+  "latency_ms": 1385.458,
   "simulated": false,
   "stop_reason": "end_turn",
   "refusal_category": ""

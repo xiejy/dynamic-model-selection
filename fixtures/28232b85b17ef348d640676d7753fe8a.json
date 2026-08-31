@@ -1,13 +1,13 @@
 {
   "model": "claude-haiku-4-5",
-  "text": "ERROR",
+  "text": "ERROR\n\nsimple",
   "usage": {
     "input_tokens": 133,
-    "output_tokens": 4,
+    "output_tokens": 6,
     "cache_creation_input_tokens": 0,
     "cache_read_input_tokens": 0
   },
-  "latency_ms": 1041.007,
+  "latency_ms": 936.138,
   "simulated": false,
   "stop_reason": "end_turn",
   "refusal_category": ""

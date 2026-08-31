@@ -7,7 +7,7 @@
     "cache_creation_input_tokens": 0,
     "cache_read_input_tokens": 0
   },
-  "latency_ms": 850.316,
+  "latency_ms": 1319.938,
   "simulated": false,
   "stop_reason": "end_turn",
   "refusal_category": ""
