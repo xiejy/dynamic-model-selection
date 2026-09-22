@@ -653,3 +653,25 @@ def test_streamed_requests_are_counted_and_billed(proxy) -> None:
 
     assert dispatcher.requests_served == 1
     assert dispatcher.total_cost_usd > 0
+
+
+def test_a_tool_bearing_request_is_refused_loudly_not_answered_falsely(proxy) -> None:
+    """Regression for a real failure: Codex's tools were dropped, the model
+    faked a tool call in text, and returned an invented `ls` result claiming a
+    directory that exists did not. Refusing is the only honest behaviour until
+    tool round-tripping is built."""
+    base, _, provider = proxy
+
+    with pytest.raises(urllib.error.HTTPError) as exc:
+        _post(
+            f"{base}/v1/responses",
+            {"input": [
+                {"type": "additional_tools", "role": "developer", "tools": []},
+                {"type": "message", "role": "user", "content": "run ls"},
+            ]},
+        )
+
+    body = exc.value.read().decode()
+    assert exc.value.code == 501
+    assert "tool" in body.lower()
+    assert provider.calls == []  # no model was asked, so nothing was invented

@@ -296,31 +296,54 @@ Two deliberate choices worth noting:
 `dms proxy` puts the measured dispatcher in front of real traffic. Callers change
 `base_url` and nothing else.
 
+> ### ⚠️ Plain question-and-answer only. No tool calling.
+>
+> The proxy cannot relay tool calls between dialects, so **any request that defines
+> tools or carries a tool-call turn is refused with `501 Not Implemented`.** That
+> rules out agentic sessions — Claude Code, and Codex doing real coding work — until
+> tool round-tripping is built.
+>
+> It refuses rather than degrading because degrading was observed to be dangerous:
+> before the guard existed, Codex's tools were silently dropped, the model faked an
+> `exec` call as plain text, and returned an **invented** `ls: tasks: No such file or
+> directory` for a directory that exists. A loud error is the honest failure.
+
 ```bash
 export ANTHROPIC_API_KEY=...
-uv run dms proxy                       # 127.0.0.1:8787, cascade, affinity on
-uv run dms proxy --strategy heuristic  # zero-token routing instead
-uv run dms proxy --low claude-haiku-4-5 --high gpt-5.6-sol   # mixed providers
+uv run dms proxy                                   # 127.0.0.1:8787, cascade, affinity on
+uv run dms proxy --strategy heuristic              # zero-token routing instead
+uv run dms proxy --high codex-cli/gpt-5.6-sol      # GPT as the high tier, no API key
 ```
 
-| endpoint | dialect | who points at it |
+| endpoint | dialect | verified with |
 |---|---|---|
-| `POST /v1/messages` | Anthropic Messages | Claude SDKs, Claude Code |
-| `POST /v1/chat/completions` | OpenAI Chat | **Codex CLI**, OpenAI SDKs |
-| `GET /healthz` · `GET /stats` | — | ops |
+| `POST /v1/messages` | Anthropic Messages | curl, Anthropic SDK shape |
+| `POST /v1/chat/completions` | OpenAI Chat | curl, OpenAI SDK shape |
+| `POST /v1/responses` | OpenAI Responses | **Codex CLI 0.146 and 0.153.4** (plain prompts) |
+| `GET /healthz` · `/stats` · `/v1/models` | — | ops; Codex probes `/v1/models` on start |
 
 ```bash
-# Anthropic client
-ANTHROPIC_BASE_URL=http://127.0.0.1:8787 claude ...
-# Codex / OpenAI client
-OPENAI_BASE_URL=http://127.0.0.1:8787/v1 codex ...
+# plain request, any HTTP client
+curl http://127.0.0.1:8787/v1/messages -H 'content-type: application/json' \
+  -d '{"model":"auto","max_tokens":256,"messages":[{"role":"user","content":"..."}]}'
+
+# Codex CLI -- the flags must be written out, not held in an unquoted variable:
+# zsh does not word-split, so all eight arrive as one argument, none apply, and
+# Codex SILENTLY falls back to its default OpenAI backend, bypassing the proxy.
+echo "your prompt" | codex exec \
+  -c model_providers.dms.name=dms \
+  -c model_providers.dms.base_url=http://127.0.0.1:8787/v1 \
+  -c model_providers.dms.wire_api=responses \
+  -c model_providers.dms.env_key=DMS_API_KEY \
+  -c model_provider=dms -c model=gpt-5.6-sol
 ```
 
 **Verified live.** A caller asking for `claude-opus-5` got answered by Haiku for
 **$0.000135** after the verifier accepted it. A consistency-guarantee question went
 `haiku → verifier said no → opus`, returning the right answer for $0.002428 with
 $0.000198 of overhead. Streaming, session affinity and `/stats` all confirmed against
-real models.
+real models. Confirm a request went through the proxy by checking `GET /stats`
+`requests_served` moved — a bypassed Codex looks identical from the client side.
 
 Every response carries a `dms_dispatch` block naming the model that actually answered,
 why, the per-leg spend, and the overhead — without it you cannot detect the silent

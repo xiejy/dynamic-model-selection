@@ -30,6 +30,14 @@ from dms.dispatch import wire
 MAX_BODY_BYTES = 32 * 1024 * 1024  # matches the Messages API request ceiling
 SESSION_HEADERS = ("x-session-id", "x-dms-session", "anthropic-session-id")
 
+TOOLS_UNSUPPORTED = (
+    "dms proxy does not support tool calling yet: this request defines tools or "
+    "carries a tool-call turn, and the proxy cannot relay tool_use/function_call "
+    "results between dialects. Refusing instead of letting the model invent tool "
+    "output. Use the proxy for plain question/answer traffic, or send agentic "
+    "sessions directly to the provider."
+)
+
 log = logging.getLogger("dms.proxy")
 
 
@@ -88,6 +96,14 @@ class DispatchHTTPRequestHandler(BaseHTTPRequestHandler):
 
         if not request.messages:
             self._json(400, wire.error_body("messages must not be empty"))
+            return
+
+        if request.uses_tools:
+            # Refuse rather than degrade. Without round-tripping, tool definitions
+            # get dropped and the model fakes the call in text and invents the
+            # result -- observed returning "No such file or directory" for a
+            # directory that exists. A loud error is the honest failure.
+            self._json(501, wire.error_body(TOOLS_UNSUPPORTED, kind="api_error"))
             return
 
         session_id = self._session_id()

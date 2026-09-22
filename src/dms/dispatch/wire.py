@@ -23,6 +23,18 @@ from dms.dispatch.providers import Request
 # Callers can force a tier by naming it as the model.
 TIER_ALIASES = {"low", "high", "auto", "cascade", "heuristic"}
 
+# Responses-API input items that define tools or carry a tool-call turn.
+# `additional_tools` is how Codex 0.153+ ships its tools: an input item wrapping
+# a namespace of custom tools, NOT the top-level `tools` array older clients use.
+_RESPONSES_TOOL_ITEMS = {
+    "additional_tools",
+    "function_call",
+    "function_call_output",
+    "custom_tool_call",
+    "custom_tool_call_output",
+}
+_ANTHROPIC_TOOL_BLOCKS = {"tool_use", "tool_result", "server_tool_use"}
+
 # Roles that mean "operator instruction" rather than a conversation turn.
 # Anthropic accepts only user/assistant in `messages`, so these fold into system.
 _SYSTEM_ROLES = {"system", "developer"}
@@ -38,14 +50,22 @@ def parse_anthropic(payload: dict[str, Any]) -> Request:
             if isinstance(block, dict) and block.get("type") == "text"
         )
 
+    messages = tuple(payload.get("messages") or ())
+    has_tool_blocks = any(
+        isinstance(block, dict) and block.get("type") in _ANTHROPIC_TOOL_BLOCKS
+        for message in messages
+        if isinstance(message.get("content"), list)
+        for block in message["content"]
+    )
     return Request(
-        messages=tuple(payload.get("messages") or ()),
+        messages=messages,
         system=system or None,
         tools=tuple(payload["tools"]) if payload.get("tools") else None,
         max_tokens=int(payload.get("max_tokens") or 4096),
         temperature=payload.get("temperature"),
         stop_sequences=tuple(payload.get("stop_sequences") or ()),
         stream=bool(payload.get("stream")),
+        uses_tools=bool(payload.get("tools")) or has_tool_blocks,
     )
 
 
@@ -70,6 +90,9 @@ def parse_openai(payload: dict[str, Any]) -> Request:
     if isinstance(stop, str):
         stop = [stop]
 
+    has_tool_turns = any(
+        m.get("role") == "tool" or m.get("tool_calls") for m in messages
+    )
     return Request(
         messages=rest,
         system="\n".join(p for p in system_parts if p) or None,
@@ -78,6 +101,7 @@ def parse_openai(payload: dict[str, Any]) -> Request:
         temperature=payload.get("temperature"),
         stop_sequences=tuple(stop or ()),
         stream=bool(payload.get("stream")),
+        uses_tools=bool(payload.get("tools") or payload.get("functions")) or has_tool_turns,
     )
 
 
@@ -266,6 +290,10 @@ def parse_responses(payload: dict[str, Any]) -> Request:
         system_parts.append(instructions)
 
     raw_input = payload.get("input")
+    uses_tools = bool(payload.get("tools")) or any(
+        isinstance(item, dict) and item.get("type") in _RESPONSES_TOOL_ITEMS
+        for item in (raw_input if isinstance(raw_input, list) else ())
+    )
     if isinstance(raw_input, str):
         messages.append({"role": "user", "content": raw_input})
     else:
@@ -295,6 +323,7 @@ def parse_responses(payload: dict[str, Any]) -> Request:
         max_tokens=int(max_tokens),
         temperature=payload.get("temperature"),
         stream=bool(payload.get("stream")),
+        uses_tools=uses_tools,
     )
 
 

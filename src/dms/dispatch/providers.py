@@ -47,6 +47,10 @@ class Request:
     stop_sequences: tuple[str, ...] = ()
     stream: bool = False
     extra: dict[str, Any] = field(default_factory=dict)
+    # True when the request defines tools or carries a tool-call turn. The proxy
+    # cannot round-trip tool calls yet, and dropping them silently makes the
+    # model fake a call in text and invent its result -- so these are refused.
+    uses_tools: bool = False
 
     @property
     def text_prompt(self) -> str:

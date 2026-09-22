@@ -486,3 +486,82 @@ def test_namespaced_ids_price_against_the_bare_model(namespaced, bare) -> None:
     from dms.pricing import PriceBook
 
     assert PriceBook.load().resolve(namespaced) == bare
+
+
+# ----------------------------------------------------- tool-calling detection
+#
+# The proxy cannot round-trip tool calls. Before this guard existed it dropped
+# tool definitions silently, and the model improvised a tool call as plain text
+# and then INVENTED the result -- a confidently false answer about the user's
+# filesystem. Tool-bearing requests must now be detected so they can be refused.
+
+
+def test_codex_additional_tools_item_is_detected() -> None:
+    """Codex 0.153+ sends tools as an `additional_tools` input item wrapping a
+    namespace of custom tools -- not in the top-level `tools` array."""
+    request = wire.parse_responses(
+        {
+            "input": [
+                {"type": "additional_tools", "role": "developer", "tools": [
+                    {"type": "namespace", "name": "functions",
+                     "tools": [{"type": "custom", "name": "exec"}]}]},
+                {"type": "message", "role": "user", "content": "run ls"},
+            ]
+        }
+    )
+
+    assert request.uses_tools
+
+
+@pytest.mark.parametrize(
+    "item_type",
+    ["function_call", "function_call_output", "custom_tool_call", "custom_tool_call_output"],
+)
+def test_responses_tool_turns_are_detected(item_type) -> None:
+    request = wire.parse_responses(
+        {"input": [{"type": item_type}, {"type": "message", "role": "user", "content": "hi"}]}
+    )
+
+    assert request.uses_tools
+
+
+def test_responses_top_level_tools_are_detected() -> None:
+    request = wire.parse_responses(
+        {"input": "hi", "tools": [{"type": "function", "name": "x"}]}
+    )
+
+    assert request.uses_tools
+
+
+def test_anthropic_tool_result_blocks_are_detected() -> None:
+    request = wire.parse_anthropic(
+        {"messages": [
+            {"role": "user", "content": "hi"},
+            {"role": "assistant", "content": [{"type": "tool_use", "id": "t", "name": "x", "input": {}}]},
+            {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "t", "content": "ok"}]},
+        ]}
+    )
+
+    assert request.uses_tools
+
+
+def test_openai_chat_tool_role_is_detected() -> None:
+    request = wire.parse_openai(
+        {"messages": [{"role": "user", "content": "hi"},
+                      {"role": "tool", "tool_call_id": "t", "content": "ok"}]}
+    )
+
+    assert request.uses_tools
+
+
+@pytest.mark.parametrize(
+    "parse,payload",
+    [
+        (wire.parse_anthropic, {"messages": [{"role": "user", "content": "hi"}]}),
+        (wire.parse_openai, {"messages": [{"role": "user", "content": "hi"}]}),
+        (wire.parse_responses, {"input": "hi"}),
+    ],
+)
+def test_plain_questions_are_not_flagged(parse, payload) -> None:
+    """The guard must not break the path that works."""
+    assert parse(payload).uses_tools is False
