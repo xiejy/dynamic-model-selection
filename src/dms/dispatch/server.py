@@ -30,7 +30,15 @@ from dms.dispatch.providers import ProviderError
 from dms.dispatch import wire
 
 MAX_BODY_BYTES = 32 * 1024 * 1024  # matches the Messages API request ceiling
-SESSION_HEADERS = ("x-session-id", "x-dms-session", "anthropic-session-id")
+# `session-id` and `thread-id` are what Codex 0.153 sends; the x- forms are for
+# callers that set a session explicitly.
+SESSION_HEADERS = (
+    "x-session-id",
+    "x-dms-session",
+    "anthropic-session-id",
+    "session-id",
+    "thread-id",
+)
 
 TOOLS_UNSUPPORTED = (
     "dms proxy does not support tool calling yet: this request defines tools or "

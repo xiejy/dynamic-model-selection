@@ -696,3 +696,23 @@ def test_a_busy_port_is_a_clear_error_not_a_traceback(capsys) -> None:
     assert code == 2
     assert "already in use" in err
     assert "--port" in err
+
+
+@pytest.mark.parametrize("header", ["session-id", "thread-id"])
+def test_codex_session_headers_pin_the_session(proxy, header) -> None:
+    """Codex 0.153 identifies a session with `session-id` and `thread-id` (the
+    same UUID as its prompt_cache_key), not `x-session-id`. Unrecognised, every
+    turn of one agent run was re-routed independently and could switch models
+    mid-task, discarding the prompt cache the pin exists to protect."""
+    base, dispatcher, _ = proxy
+    sid = {header: "01a0cd7d-6150-77f1-84f5-3e2e56bebc00"}
+
+    _post(f"{base}/v1/messages",
+          {"model": "x", "max_tokens": 16,
+           "messages": [{"role": "user", "content": "Extract the port number."}]}, sid)
+    second = _post(f"{base}/v1/messages",
+                   {"model": "x", "max_tokens": 16,
+                    "messages": [{"role": "user", "content": "Explain this deadlock."}]}, sid)
+
+    assert "affinity" in second["dms_dispatch"]["why"]
+    assert len(dispatcher.affinity) == 1
