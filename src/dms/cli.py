@@ -63,6 +63,26 @@ def main(argv: list[str] | None = None) -> int:
         help="re-decide every turn (forfeits the prompt cache; usually a loss)",
     )
 
+    passthrough = sub.add_parser(
+        "passthrough",
+        help="choose low/high per message, forward everything else to your router",
+    )
+    passthrough.add_argument("--family", required=True, choices=["openai", "anthropic"],
+                             help="openai for Codex, anthropic for Claude Code")
+    passthrough.add_argument("--upstream", required=True,
+                             help="the router the client normally uses, e.g. http://127.0.0.1:18790")
+    passthrough.add_argument("--high", required=True,
+                             help="the main model exactly as the client sends it")
+    passthrough.add_argument("--low", required=True, help="the cheaper model to route down to")
+    passthrough.add_argument("--port", type=int, default=8789)
+    passthrough.add_argument("--host", default="127.0.0.1")
+    passthrough.add_argument("--usage-log", type=Path, default=None,
+                             help="JSONL ledger (default ~/.dms/usage.jsonl)")
+
+    usage = sub.add_parser("usage", help="low/high split and cost from the pass-through ledger")
+    usage.add_argument("--usage-log", type=Path, default=None)
+    usage.add_argument("--json", action="store_true")
+
     sub.add_parser("tasks", help="show the workload mix")
     sub.add_parser(
         "levers",
@@ -90,6 +110,10 @@ def main(argv: list[str] | None = None) -> int:
             return _levers(args)
         case "proxy":
             return _proxy(args)
+        case "passthrough":
+            return _passthrough(args)
+        case "usage":
+            return _usage(args)
         case _:
             return _bench(args)
 
@@ -155,6 +179,77 @@ def _proxy(args: argparse.Namespace) -> int:
         config = _replace(config, **overrides)
 
     return serve(args.host, args.port, config)
+
+
+def _passthrough(args: argparse.Namespace) -> int:
+    import errno
+    import logging
+
+    from dms.passthrough.ledger import DEFAULT_LEDGER, Ledger
+    from dms.passthrough.select import PassthroughSelector, downgrade_warning
+    from dms.passthrough.server import build_passthrough_server
+
+    book = PriceBook.load()
+    low_context = book.context_window.get(book.resolve(args.low))
+    selector = PassthroughSelector(
+        family=args.family, low=args.low, high=args.high, low_context_tokens=low_context
+    )
+    ledger = Ledger(args.usage_log or DEFAULT_LEDGER)
+    try:
+        server = build_passthrough_server(
+            args.host, args.port, family=args.family, upstream=args.upstream,
+            selector=selector, ledger=ledger, book=book,
+        )
+    except OSError as exc:
+        if exc.errno != errno.EADDRINUSE:
+            raise
+        print(f"error: {args.host}:{args.port} is already in use; pick another with --port",
+              file=sys.stderr)
+        return 2
+    except ValueError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
+
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
+    base = f"http://{args.host}:{args.port}"
+    print(f"dms passthrough ({args.family}) on {base} -> {args.upstream}")
+    print(f"  high  {args.high}   (the only model it ever changes)")
+    print(f"  low   {args.low}" + (f"   (context {low_context:,} tokens)" if low_context else ""))
+    print(f"  usage {ledger.path}   ·   live totals: {base}/_dms/stats")
+    if warning := downgrade_warning(args.family, args.low):
+        print(f"  WARNING: {warning}")
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        print("\nstopped -- run `dms usage` for the report")
+    finally:
+        server.server_close()
+    return 0
+
+
+def _usage(args: argparse.Namespace) -> int:
+    from dms.passthrough.ledger import DEFAULT_LEDGER, Ledger, _as_dict, render, summarise
+
+    ledger = Ledger(args.usage_log or DEFAULT_LEDGER)
+    events = ledger.read()
+    if not events:
+        print(f"no requests recorded in {ledger.path}")
+        return 0
+
+    book = PriceBook.load()
+    reports = {
+        family: summarise([e for e in events if e.family == family], book)
+        for family in sorted({e.family for e in events})
+    }
+
+    if args.json:
+        print(json.dumps({f: _as_dict(s) for f, s in reports.items()}, indent=2))
+        return 0
+    print(f"ledger {ledger.path}  ·  {events[0].ts} .. {events[-1].ts}")
+    for family, summary in reports.items():
+        print(f"\n== {family} ==")
+        print(render(summary))
+    return 0
 
 
 def _levers(_: argparse.Namespace) -> int:

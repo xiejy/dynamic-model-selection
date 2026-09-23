@@ -396,6 +396,105 @@ regression this repo spends its whole README warning about.
 - **Routers score only user turns**, so the decision does not drift as the assistant's
   own output accumulates.
 
+### Pass-through mode — dynamic selection inside Codex and Claude Code
+
+`dms proxy` translates between providers, and that is exactly what stops Codex: its tool
+calls cannot cross from OpenAI's format to Claude's, and `claude -p` never returns tool calls
+at all. **Pass-through mode avoids the problem by staying within one provider:** it picks the
+cheap or expensive model *of the same family*, rewrites only the `model` field, and forwards
+everything else — tools, tool results, streaming, your login — byte for byte to the router
+the client already uses. No API key; tool calling works; interactive sessions work.
+
+```bash
+# Codex: choose Luna or Sol per message, through your ChatGPT login (codex-router)
+uv run dms passthrough --family openai --upstream http://127.0.0.1:18790 \
+  --high gpt-5.6-sol@personal --low gpt-5.6-luna@personal --port 8789
+
+codex -c model_providers.dms.name=dms \
+      -c model_providers.dms.base_url=http://127.0.0.1:8789/v1 \
+      -c model_providers.dms.wire_api=responses \
+      -c model_providers.dms.requires_openai_auth=true \
+      -c model_provider=dms -m gpt-5.6-sol@personal
+
+# Claude Code: choose Sonnet or Opus per message, through your Claude login (claude-router)
+uv run dms passthrough --family anthropic --upstream http://127.0.0.1:18791 \
+  --high claude-opus-5 --low claude-sonnet-5 --port 8790
+
+ANTHROPIC_BASE_URL=http://127.0.0.1:8790 ANTHROPIC_AUTH_TOKEN=claude-router-local \
+  claude --model claude-opus-5
+
+# the report: requests routed low vs high, and cost vs sending everything high
+uv run dms usage
+```
+
+**How it decides.** Only requests for the `--high` model are ever changed; anything else the
+client asks for (Claude Code's safety classifier, background calls) passes through untouched.
+Each **new message you type** is scored by the zero-token heuristic, on the text you typed:
+Claude Code's `<system-reminder>`s and Codex's environment, AGENTS.md and IDE context blocks
+are stripped first (the IDE's browser context alone used to push every message over the
+long-prompt threshold). Every **tool step** that message triggers stays on the same model,
+because switching mid-task discards the prompt cache. A conversation too large for the low
+model's context window stays high.
+
+The choice is remembered **per conversation**: the most specific session header (Codex's
+`thread-id`; Claude Code's session id plus `x-claude-code-agent-id`) and the conversation's
+opening message. Sub-agents and side requests on the main model (Claude Code's web search)
+open with a message of their own, so they are decided on their own and never move the
+parent's turn to another model mid-task.
+
+**Usage ledger.** Every request is one line in `~/.dms/usage.jsonl`: tier, turn, tokens,
+status, latency — no prompt text, no credentials. `dms usage` groups by family and prices
+routed requests two ways: as served, and as if each had gone to the model it asked for.
+`GET /_dms/stats` shows the same totals live.
+
+The all-high side is **not** just the same tokens re-priced: caches are per model, so routing
+between two models leaves each one cold where a single model would have been warm. The
+counterfactual bills those tokens as the cache reads they would have been — the conversation
+already sent, after a switch within a session; and the prefix every session shares (Claude
+Code's system prompt and tools, sized by the largest cache read any session opened with) when
+routing had left a model unused. Otherwise a switch's cold write shows up as a *saving*.
+
+**Verified live** with `codex exec` and `claude -p` (the interactive TUIs send the same
+requests; they were not driven directly):
+
+| run | requests | routed low | saved vs all-high |
+|---|---:|---:|---:|
+| Codex, Luna/Sol — `ls tasks`, then a design question | 7 | 5 (71%) | **53.5%** |
+| Codex, Luna/Sol — a hard question that spawned 8 sub-agents | 113 | 22 (19%) | **16.1%** |
+| Claude Code, Sonnet/Opus — 3 easy messages, 1 hard | 4 | 3 (75%) | **−46.3%** (cost more) |
+| Claude Code, Sonnet/Opus — 2 easy messages, each with a sub-agent | 8 | 8 (100%) | **40.0%** |
+
+Tool calls ran for real in every run, with correct results. In the sub-agent runs each
+sub-agent kept its own choice while the parent's stayed put: the Codex parent thread held
+Sol through all 15 of its tool steps while one of its sub-agents ran on Luna.
+
+**Read the Claude Code rows together.** Routed down, a conversation saves the full price gap
+(40%). But Claude Code sends a ~52k-token prefix that every session shares, and each model
+keeps its own cache of it. In the third row the one message routed to Opus found Opus cold
+and paid a 66k-token write ($0.41); an all-Opus run would have read the shared 52k from
+cache ($0.03) and written only the other 14k ($0.09). That difference is more than the three
+Sonnet messages saved. (This row was first reported here as *16.3% saved*;
+the review behind this revision found the counterfactual was pricing that cold write as if
+Opus would have paid it anyway.) Splitting traffic means keeping two caches warm, and with
+short sessions the second cache costs more than the cheaper model saves — the
+routing-versus-caching tension from the top of this README, measured live. Codex does not
+pay this across sessions: its cache is keyed per session, so no session opens warm to begin
+with.
+
+**Security.** The proxy binds only to `127.0.0.1` (behind it sits your logged-in router),
+never uses an HTTP proxy the environment or macOS configures, relays redirects instead of
+following them — each would let your login header leave localhost — and redacts
+token-shaped strings from the upstream error text it logs.
+
+**Don't use Haiku as Claude Code's low model.** Claude Code shapes each request for the model
+it believes it is using. Haiku 4.5 rejected the Opus-shaped request three times — *adaptive
+thinking is not supported*, *does not support the effort parameter*, *role 'system' is not
+supported* — and Claude Code retried after stripping each, so every routed-down message costs
+three failed round trips. Sonnet 5 accepts the request unchanged. The proxy warns at startup.
+
+Also: after a downgrade Claude Code still reports `claude-opus-5` and prices its own cost
+display at Opus rates. The ledger is the accurate record.
+
 ### Driving it from Codex CLI
 
 Codex 0.146 **removed `wire_api = "chat"`** and speaks only the Responses API, so the

@@ -228,3 +228,17 @@ def test_automatic_caching_providers_report_no_cache_floor(book: PriceBook) -> N
     """Claude models have a minimum cacheable prefix; OpenAI's is not a concept."""
     assert book.min_cache_prefix_tokens("gpt-5.6-luna") == 0
     assert book.will_cache("gpt-5.6-luna", 10) is True
+
+
+@pytest.mark.parametrize(
+    "routed,bare",
+    [
+        ("gpt-5.6-sol@personal", "gpt-5.6-sol"),     # codex-router account tag
+        ("claude-opus-5@extra", "claude-opus-5"),   # claude-router account tag
+        ("claude-opus-5[1m]", "claude-opus-5"),     # Claude Code 1M-context marker
+    ],
+)
+def test_router_tags_price_against_the_bare_model(book: PriceBook, routed, bare) -> None:
+    """The local routers add an account tag or a context marker; the per-token
+    rate belongs to the underlying model."""
+    assert book.resolve(routed) == bare

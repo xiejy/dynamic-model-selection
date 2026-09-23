@@ -113,6 +113,13 @@ class PriceBook:
         if model in snapshot["models"]:
             return model
 
+        # Local routers tag the account ("gpt-5.6-sol@personal", "claude-opus-5@extra")
+        # and Claude Code marks 1M context ("claude-opus-5[1m]"). Neither changes
+        # the per-token rate.
+        model = model.split("@", 1)[0].replace("[1m]", "")
+        if model in snapshot["models"]:
+            return model
+
         # Namespaced ids -- "codex-cli/gpt-5.6-sol" (this repo) or
         # "openai/gpt-5.6-sol" (OpenRouter) -- price against the bare model.
         # The transport differs; the per-token rates do not.
