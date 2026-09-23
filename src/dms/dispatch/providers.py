@@ -134,14 +134,19 @@ class AnthropicProvider:
         self._book = book
 
     def handles(self, model: str) -> bool:
-        return model.startswith("claude-")
+        # Namespaced ids such as `claude-cli/claude-haiku-4-5` also start with
+        # "claude-"; they belong to another backend and have no API model id.
+        return model.startswith("claude-") and "/" not in model
 
     @property
     def client(self) -> Any:
         if self._client is None:
             if not os.environ.get("ANTHROPIC_API_KEY"):
                 raise ProviderError(
-                    "ANTHROPIC_API_KEY is not set; cannot call Claude models"
+                    "ANTHROPIC_API_KEY is not set; cannot call Claude models. "
+                    "Without a key, name the tiers claude-cli/<model> to go "
+                    "through your Claude Code login, e.g. "
+                    "--low claude-cli/claude-haiku-4-5 --high claude-cli/claude-opus-5"
                 )
             from anthropic import Anthropic
 
@@ -432,6 +437,24 @@ def _openai_usage(usage: dict[str, Any]) -> UsageRecord:
     )
 
 
+def transcript_text(messages: tuple[dict[str, Any], ...]) -> str:
+    """Flatten a message list into one prompt, for backends that take a single
+    prompt rather than a conversation (the Codex and Claude Code CLIs)."""
+    parts: list[str] = []
+    for message in messages:
+        content = message.get("content")
+        if isinstance(content, list):
+            content = "".join(
+                block.get("text", "")
+                for block in content
+                if isinstance(block, dict) and block.get("type") in ("text", "input_text")
+            )
+        if content:
+            role = message.get("role", "user")
+            parts.append(content if role == "user" else f"[{role}] {content}")
+    return "\n\n".join(parts)
+
+
 def _to_openai_messages(messages: tuple[dict[str, Any], ...]) -> list[dict[str, Any]]:
     """Flatten Anthropic-style block content into OpenAI's plain strings."""
     out: list[dict[str, Any]] = []
@@ -478,9 +501,11 @@ class ProviderRegistry:
         book: Any | None = None,
     ) -> None:
         if providers is None:
+            from dms.dispatch.claude_cli import ClaudeCLIProvider
             from dms.dispatch.codex_cli import CodexCLIProvider
 
             providers = (
+                ClaudeCLIProvider(),  # claude-cli/<model>: the Claude Code login
                 AnthropicProvider(
                     cache_system=cache_system, cache_ttl=cache_ttl, book=book
                 ),

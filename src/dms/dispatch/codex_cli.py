@@ -32,7 +32,7 @@ import time
 from collections.abc import Iterator
 from typing import Any
 
-from dms.dispatch.providers import Completion, ProviderError, Request
+from dms.dispatch.providers import Completion, ProviderError, Request, transcript_text
 from dms.usage import UsageRecord
 
 DEFAULT_TIMEOUT_SECONDS = 300
@@ -93,21 +93,9 @@ class CodexCLIProvider:
         execute things is not a translation, it is a security decision nobody
         asked for.
         """
-        parts: list[str] = []
-        if request.system:
-            parts.append(request.system)
-        for message in request.messages:
-            content = message.get("content")
-            if isinstance(content, list):
-                content = "".join(
-                    block.get("text", "")
-                    for block in content
-                    if isinstance(block, dict) and block.get("type") in ("text", "input_text")
-                )
-            if content:
-                role = message.get("role", "user")
-                parts.append(content if role == "user" else f"[{role}] {content}")
-        return "\n\n".join(parts)
+        parts = [request.system] if request.system else []
+        parts.append(transcript_text(request.messages))
+        return "\n\n".join(part for part in parts if part)
 
     def complete(self, model: str, request: Request) -> Completion:
         started = time.perf_counter()

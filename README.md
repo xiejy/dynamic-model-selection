@@ -309,11 +309,41 @@ Two deliberate choices worth noting:
 > directory` for a directory that exists. A loud error is the honest failure.
 
 ```bash
+# with an Anthropic API key
 export ANTHROPIC_API_KEY=...
 uv run dms proxy                                   # 127.0.0.1:8787, cascade, affinity on
 uv run dms proxy --strategy heuristic              # zero-token routing instead
-uv run dms proxy --high codex-cli/gpt-5.6-sol      # GPT as the high tier, no API key
+
+# with NO API key: Claude through your Claude Code login, GPT through your ChatGPT login
+uv run dms proxy --low claude-cli/claude-haiku-4-5 --high claude-cli/claude-opus-5
+uv run dms proxy --low claude-cli/claude-haiku-4-5 --high codex-cli/gpt-5.6-sol
 ```
+
+Add `--port <n>` if 8787 is taken; the proxy says so plainly when it is.
+
+### Claude without an API key (`claude-cli/<model>`)
+
+A `claude-cli/` tier runs `claude -p --output-format json` — Claude Code's documented
+headless mode — so it bills the **subscription login** `CLAUDE_CONFIG_DIR` points at
+(unset: `~/.claude`). `ANTHROPIC_API_KEY`, `ANTHROPIC_AUTH_TOKEN` and `ANTHROPIC_BASE_URL`
+are stripped from the child process, so it can never fall back to an API key or gateway.
+
+Every call switches Claude Code's agent harness off — no tools, MCP servers, settings,
+plugins, hooks, skills or saved session, and the caller's system prompt replaces Claude
+Code's. That keeps a one-line question at ~400 input tokens. (`--bare` would skip more, but
+it refuses OAuth and demands an API key.)
+
+**Verified live, no key set:** `0xFF` → `255` on Haiku, verified by Haiku; the LRU question
+→ `5` on Opus in 4.0 s. Limits, all inherent to driving a CLI: ~3–4 s per call (process
+start), `max_tokens`/`temperature`/`stop` are ignored, streaming is one chunk, and costs are
+**API-equivalent** figures — the real spend is subscription quota. One trap handled: on an
+API error `claude -p` reports `subtype: "success"` with the error text in `result`; only
+`is_error` marks it, so the provider raises rather than returning the error as an answer.
+
+**It cannot carry Codex.** Codex needs the model to *return* tool calls for Codex to run;
+`claude -p` runs its own tools instead. For an agentic task on your Claude login, run Claude
+Code itself as the agent — `claude -p --model claude-haiku-4-5 "…"` — the same way Codex
+runs with `-m`.
 
 | endpoint | dialect | verified with |
 |---|---|---|
