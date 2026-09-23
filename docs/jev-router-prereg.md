@@ -53,3 +53,65 @@ and cost/latency per decision against the LLM classifier.
   counting; several NEEDS HIGH tasks are exactly that. It is asked to *recognise* that a
   task needs careful stepping, never to do the stepping — but that distinction is what
   this experiment tests.
+
+---
+
+# Results — added 2026-09-23, after the run. Everything above is unchanged.
+
+**Verdict: Jev does not pass.** 36 live requests to `jev-1.13.0`, 19,643 input tokens,
+**$0.000825** total, latency median 525 ms (max 688 ms; the vendor states 70–500 ms).
+
+| router | accuracy | % sent high | cost | |
+|---|---:|---:|---:|---|
+| heuristic | 95.4% | 58% | $0.0217 | the bar |
+| **Jev** | **90.7%** | **17%** | **$0.0122** | FAIL quality · PASS selectivity · PASS cost |
+| label-perfect router | 94.4% | 17% | $0.0133 | the ceiling |
+
+Diagnostics: AUC **0.703** (below the 0.80 "useful ranker" line); recall **3/5** on the
+routable tasks; mean confidence 0.70 where right, 0.51 where wrong.
+
+## What it gets right and wrong
+
+- **Multi-step computation: perfect.** `h01` (trace a loop), `h12` (count LRU misses) and
+  `m09` (evaluate a comprehension) all scored ~2.0 at confidence 0.96–1.00, with the
+  `multi_step` Noul at 0.92–0.98.
+- **Subtle-terminology traps: blind.** Jev **never used level 3** — the highest score
+  across all 36 tasks was exactly 2.00. The `trap` Noul rated both misses (0.34, 0.51)
+  *below* two false alarms (0.64, 0.67).
+
+## The misses sit on this benchmark's weakest labels
+
+Both routable tasks Jev missed are cases where **Haiku's answer was defensible and the
+grader rejected it**:
+
+- `h05` — Haiku answered *"Read-after-write consistency"*, a standard synonym for
+  read-your-writes. The grader's accepted list omits it. This is a **grader bug**.
+- `h11` — Haiku answered **Ω(n log n)**, the correct notation for a lower bound; the
+  prompt asked for "big-O notation", which is itself imprecise here. A **task-design bug**.
+
+These defects inflate Haiku's failure rate in **every** result in this repo, not only
+Jev's. They are recorded here and **not corrected in this evaluation**: changing graders
+after seeing which router they penalise is what pre-registration exists to prevent. Fix
+them, then pre-register a fresh run.
+
+## Exploratory, not a verdict
+
+The one follow-up the Jev documentation itself suggests — route high when confidence is
+low — was tried post-hoc:
+
+| rule | accuracy | % high | cost |
+|---|---:|---:|---:|
+| pre-registered: level ≥ 2 | 90.7% | 17% | $0.0122 |
+| level ≥ 2 **or** confidence < 0.60 | 93.5% | 50% | $0.0196 |
+
+It recovers accuracy only by spending the selectivity, converging on the free heuristic
+while still trailing it. Here the confidence lever turns Jev into a slightly worse,
+slightly cheaper heuristic.
+
+## Conclusion
+
+Not as the sole model selector, on this workload. Jev's distinctive signal is real —
+it recognises *"this needs careful stepping"* almost perfectly — but a router also needs
+*"a plausible answer here is often wrong"*, and Jev does not see that. Worth revisiting
+only after the graders are fixed, on traffic where multi-step work dominates, and with a
+fresh pre-registration.
