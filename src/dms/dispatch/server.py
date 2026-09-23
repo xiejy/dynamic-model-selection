@@ -15,9 +15,11 @@ and would carry over unchanged.
 """
 from __future__ import annotations
 
+import errno
 import json
 import logging
 import os
+import sys
 from decimal import Decimal
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any
@@ -272,7 +274,20 @@ def serve(host: str = "127.0.0.1", port: int = 8787, config: DispatchConfig | No
         level=os.environ.get("DMS_LOG_LEVEL", "INFO"),
         format="%(message)s",
     )
-    server = build_server(host, port, config)
+    try:
+        server = build_server(host, port, config)
+    except OSError as exc:
+        if exc.errno != errno.EADDRINUSE:
+            raise
+        # Otherwise the proxy dies with a raw traceback while whatever holds the
+        # port keeps answering -- and its errors look like the proxy's.
+        print(
+            f"error: {host}:{port} is already in use by another process.\n"
+            f"  see what holds it:  lsof -nP -iTCP:{port} -sTCP:LISTEN\n"
+            f"  or pick another:    uv run dms proxy --port <free port>",
+            file=sys.stderr,
+        )
+        return 2
     cfg = server.dispatcher.config  # type: ignore[attr-defined]
 
     print(f"dms proxy listening on http://{host}:{port}")

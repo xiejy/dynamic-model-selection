@@ -675,3 +675,24 @@ def test_a_tool_bearing_request_is_refused_loudly_not_answered_falsely(proxy) ->
     assert exc.value.code == 501
     assert "tool" in body.lower()
     assert provider.calls == []  # no model was asked, so nothing was invented
+
+
+def test_a_busy_port_is_a_clear_error_not_a_traceback(capsys) -> None:
+    """Port 8787 was already taken on the author's machine by an unrelated
+    service; the proxy died with a raw OSError traceback, and requests then hit
+    the other service and returned its unrelated errors."""
+    import socket
+
+    from dms.dispatch.server import serve
+
+    with socket.socket() as squatter:
+        squatter.bind(("127.0.0.1", 0))
+        squatter.listen()
+        port = squatter.getsockname()[1]
+
+        code = serve("127.0.0.1", port, DispatchConfig())
+
+    err = capsys.readouterr().err
+    assert code == 2
+    assert "already in use" in err
+    assert "--port" in err
