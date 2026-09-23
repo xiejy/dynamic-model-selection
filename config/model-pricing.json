@@ -16,7 +16,8 @@
     "gpt-5.5",
     "gpt-5.6-luna",
     "gpt-5.6-sol",
-    "gpt-5.6-terra"
+    "gpt-5.6-terra",
+    "jev-1.13.0"
   ],
   "min_cache_prefix_tokens": {
     "_note": "NOT monotonic with price. Below these thresholds caching silently no-ops: no error, just cache_creation_input_tokens == 0. This is the core of the routing-vs-caching tension.",
@@ -87,6 +88,11 @@
           "input_usd_per_million": "2.5",
           "cached_input_usd_per_million": "0.25",
           "output_usd_per_million": "15"
+        },
+        "jev-1.13.0": {
+          "_note": "TypeSafe Jev (System One): a typed judgment model, not an LLM. Output tokens are free.",
+          "input_usd_per_million": "0.042",
+          "output_usd_per_million": "0"
         }
       }
     },
@@ -138,6 +144,11 @@
           "input_usd_per_million": "2.5",
           "cached_input_usd_per_million": "0.25",
           "output_usd_per_million": "15"
+        },
+        "jev-1.13.0": {
+          "_note": "TypeSafe Jev (System One): a typed judgment model, not an LLM. Output tokens are free.",
+          "input_usd_per_million": "0.042",
+          "output_usd_per_million": "0"
         }
       }
     }
