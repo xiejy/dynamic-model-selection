@@ -7,3 +7,6 @@ htmlcov/
 *.egg-info/
 .env
 out/
+
+# screenshots from the owner's lab -- published only with the private artifact, never pushed
+slides-private/

@@ -137,7 +137,9 @@ nothing probes word boundaries.
 
 ## Round 1 — adversarial review (8 agents: 4 finders, 4 verifiers)
 
-54 findings, about 45 verified as real. The largest class: **word-boundary straddles**.
+84 findings, 75 verified as real (some overlap: two reviewers could find the same
+straddle; an earlier version of this note said "54, about 45", which was a miscount).
+The largest class: **word-boundary straddles**.
 Chinese is written without spaces, so a two-character marker matches across two words —
 一下+标题 contains 下标 ("index"), 开发+生产 contains 发生 ("occur"), 一下+界面 contains 下界
 ("lower bound"). Also missing colloquial forms (怎么这么慢 as "why"), gaps that could not
@@ -152,7 +154,8 @@ Effect, **in-sample** (these are the pairs the fixes were made against), on the 
 
 - **Natural sample.** Two agents who never saw the router wrote 208 zh/en pairs of
   everyday traffic (`tasks/zh-natural-pairs.jsonl`). This is the out-of-sample check.
-- **Fresh hunters and a code re-review**, forbidden to read round 1's findings.
+- **Fresh hunters and a code re-review**, forbidden to read round 1's findings: 87
+  findings, 82 verified as real.
 
 The code re-review found a **high-severity regression introduced in round 1**: a "what +
 noun" guard meant for 设置为什么值 also killed genuine whys whose subject follows 为什么
@@ -173,6 +176,9 @@ by the natural sample**: 偶发/偶现 and 啥原因/什么原因, added in roun
 | frozen (`a26576c`) | 88.9% | 59 / 81 | 27 / 127 |
 | round 1 (`eff62e9`) | 88.9% | 59 / 81 | 29 / 127 |
 | round 2 (final) | 90.9% | 57 / 81 | 27 / 127 |
+
+On the owner's 507 Chinese Codex messages the final router sends 38% high (26% before;
+64 moved up, none down) — the frozen router's 39% is the figure under *Reported alongside*.
 
 **Chinese support is the whole win** on real traffic: without it, 68 of 81 hard Chinese
 prompts went to the cheap model; with it, the split matches English almost exactly. **The

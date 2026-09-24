@@ -6,7 +6,7 @@
 <style>
   :root {
     --ground:#F1F4F7; --surface:#FFFFFF; --sunk:#E8EDF2; --ink:#131B23;
-    --muted:#5A6773; --rule:#D7DFE6; --accent:#1F5F8B; --spend:#A85B27; --saved:#226F5E;
+    --muted:#5A6773; --rule:#D7DFE6; --accent:#1F5F8B; --spend:#9E5423; --saved:#226F5E;
     --shadow:0 1px 2px rgba(19,27,35,.06), 0 8px 24px -14px rgba(19,27,35,.22);
   }
   @media (prefers-color-scheme: dark) {
@@ -91,6 +91,35 @@
   .callout{background:var(--sunk);border:1px solid var(--rule);border-left:3px solid var(--spend);
     border-radius:4px;padding:15px 17px;margin:22px 0;max-width:74ch}
   .callout p:last-child{margin-bottom:0}
+  a{color:var(--accent);text-underline-offset:2px}
+  section:has(+ section.update){border-bottom:0}
+  section.update{border-top:2px solid var(--ink);margin-top:36px;padding-top:34px}
+  .update .kicker{margin-bottom:12px}
+  .flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:20px 0 6px;
+    font-family:"JetBrains Mono",monospace;font-size:12.5px}
+  .flow .node{background:var(--surface);border:1px solid var(--rule);border-radius:4px;
+    padding:8px 11px;line-height:1.35}
+  .flow .node small{display:block;color:var(--muted);font-size:11px}
+  .flow .node.me{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+  .flow .arrow{color:var(--muted)}
+  .rules{display:grid;gap:10px 28px;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));
+    margin:18px 0 6px;padding:0;list-style:none}
+  .rules li{border-top:1px solid var(--rule);padding-top:9px;font-size:15px}
+  .rules li b{display:block;font-family:Archivo,sans-serif;font-weight:600;font-size:15.5px;margin-bottom:2px}
+  td.l{text-align:left}
+  .stat .n.saved{color:var(--saved)}
+  .stat .n.spend{color:var(--spend)}
+  .stat .n.fit{white-space:nowrap;font-size:clamp(1.25rem,6vw,1.75rem)}
+  .zh{white-space:nowrap}
+  figure.shot{margin:22px 0;max-width:760px}
+  figure.shot img{display:block;width:100%;height:auto;border:1px solid var(--rule);border-radius:6px;
+    box-shadow:var(--shadow);background:var(--surface)}
+  figure.shot figcaption{font-size:13.5px;color:var(--muted);margin-top:9px;max-width:74ch}
+  @media (max-width:640px){
+    .flow{flex-direction:column;align-items:flex-start;gap:4px}
+    .flow .arrow{display:inline-block;transform:rotate(90deg);margin-left:14px}
+  }
+  @media (max-width:520px){.strip > .stat:last-child:nth-child(odd){grid-column:1/-1}}
   footer{padding:34px 0 0;margin-top:30px;border-top:2px solid var(--ink);
     font-size:13.5px;color:var(--muted)}
   :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
@@ -115,6 +144,7 @@
       <span><b>Spend</b> $0.7633</span>
       <span><b>Tasks</b> 36 (12 easy / 12 medium / 12 hard)</span>
       <span><b>Models</b> claude-haiku-4-5 · claude-opus-5</span>
+      <span><b>Updated</b> 2026-09-24 &middot; <a href="#since">pass-through, a live Codex call, Chinese prompts</a></span>
     </div>
   </header>
 
@@ -526,16 +556,277 @@
     </div>
   </section>
 
+  <!-- =============================================== update: pass-through -->
+  <section class="update" id="since">
+    <p class="kicker">Since the scorecard &middot; 2026-09-24</p>
+    <h2>Dynamic selection inside Codex and Claude Code</h2>
+    <p>
+      The proxy above <em>translates</em> between providers, and that is what stops a coding
+      agent: Codex's tool calls cannot cross into Claude's format, and <code>claude -p</code>
+      never returns a tool call at all. <strong>Pass-through mode stays inside one model
+      family.</strong> It picks the cheap or the expensive model of the same family, rewrites
+      only the <code>model</code> field, and forwards everything else unchanged &mdash; tools,
+      tool results, streaming, the login &mdash; to the router the client already uses. No API
+      key; tool calling works; the interactive Codex TUI works (Claude Code has so far been
+      driven through <code>claude -p</code>).
+    </p>
+
+    <div class="flow" role="img" aria-label="Codex sends to the dms pass-through proxy, which forwards to codex-router, which forwards to OpenAI on the ChatGPT login">
+      <span class="node">codex-dms<small>Codex 0.156.1</small></span><span class="arrow">&rarr;</span>
+      <span class="node me">dms passthrough<small>:8789 &middot; picks luna or sol</small></span><span class="arrow">&rarr;</span>
+      <span class="node">codex-router<small>:18790 &middot; ChatGPT login</small></span><span class="arrow">&rarr;</span>
+      <span class="node">gpt-5.6-luna / gpt-5.6-sol</span>
+    </div>
+
+    <ul class="rules">
+      <li><b>Only the main model is ever changed.</b> Anything else the client asks for
+        &mdash; a safety classifier, a background call &mdash; passes untouched.</li>
+      <li><b>Each typed message is scored.</b> The zero-token heuristic reads what you typed,
+        not the context the client wraps around it.</li>
+      <li><b>Tool steps keep their turn's model</b> &mdash; unless the conversation outgrows
+        the cheap model's context window, when it moves up mid-task. Otherwise switching
+        would discard the prompt cache halfway through.</li>
+      <li><b>Every generation request is ledgered.</b> Tier, tokens, status, latency &mdash;
+        no prompt text, no credentials &mdash; in <code>~/.dms/usage.jsonl</code>.</li>
+    </ul>
+  </section>
+
+  <!-- =============================================== update: the live Codex call -->
+  <section>
+    <h2>A real call, placed by Codex through the proxy</h2>
+    <p>
+      One working session through <code>codex-dms</code>: two typed messages. The first
+      prepared the RingCX agent page and stopped to ask before dialling; the second found the
+      workspace skill that triggers a call and used it. The call reached the lab agent and was
+      auto-answered.
+    </p>
+
+    <figure class="shot">
+      <img src="call-success.jpg" width="1400" height="1073" loading="lazy"
+           alt="RingCX Agent screen with an active call: lead RCX Test, auto-answer on, hang-up button showing"
+           onerror="this.closest('figure').hidden = true">
+      <figcaption>The result: the call is live in the RingCX agent UI, auto-answered.
+        Codex placed it; the proxy chose the model for every one of its steps.</figcaption>
+    </figure>
+
+    <div class="strip">
+      <div class="stat"><span class="n">116</span><span class="l">requests through the proxy today</span></div>
+      <div class="stat"><span class="n">83%</span><span class="l">sent to gpt-5.6-luna (96 of 116)</span></div>
+      <div class="stat"><span class="n spend">$3.30</span><span class="l">as served &middot; $7.52 had all gone to gpt-5.6-sol</span></div>
+      <div class="stat"><span class="n saved">56%</span><span class="l">saved &mdash; with the bug below; ~78% without it</span></div>
+    </div>
+
+    <div class="card">
+      <header>
+        <span class="grade exact">Measured live</span>
+        <span class="what">~/.dms/usage.jsonl &middot; Codex's own session log for what each request was</span>
+      </header>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>What was asked</th><th style="text-align:left">Routed to</th>
+            <th>Requests</th><th>Cost</th><th style="text-align:left">Why</th></tr></thead>
+          <tbody>
+            <tr><td>&ldquo;make a call to agent &hellip;&rdquo;</td>
+              <td class="n l">luna</td><td class="n">25</td><td class="n">$0.2068</td>
+              <td class="l">no difficulty marker (score 0.0); its 24 tool steps kept that choice</td></tr>
+            <tr class="hl"><td>&ldquo;do you have access to workspace skill? &hellip;&rdquo;</td>
+              <td class="n l">luna</td><td class="n">37 + 33</td><td class="n">$0.9733</td>
+              <td class="l">score 0.0; the second figure is a sub-agent it spawned, decided on its own</td></tr>
+            <tr class="hl"><td>&hellip; the same turn, from 07:25 UTC</td>
+              <td class="n l">sol</td><td class="n">19</td><td class="n down">$2.0687</td>
+              <td class="l"><b>a proxy bug</b> &mdash; see below</td></tr>
+            <tr><td>Codex's own &ldquo;generate a task title&rdquo; call</td>
+              <td class="n l">sol</td><td class="n">1</td><td class="n">$0.0367</td>
+              <td class="l">its long built-in prompt scored 3.5</td></tr>
+            <tr class="dim"><td>&ldquo;exit&rdquo;, typed into an earlier launch</td>
+              <td class="n l">luna</td><td class="n">1</td><td class="n">$0.0154</td>
+              <td class="l">score 0.0</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="body">
+        <p class="note">
+          The first turn ran 22 computer-use calls and 2 idle waits on Luna; two early tab
+          lookups errored and it recovered on its own. Dollar figures are API-equivalent at
+          published rates; on a ChatGPT subscription nothing is billed per token.
+        </p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <p>
+        <strong>The bug this run found &mdash; fixed the same day.</strong> The proxy keeps a
+        conversation off the cheap model once it outgrows that model's context window, and it
+        estimated size as <em>request bytes &divide; 3</em>. The browser task's request had grown
+        to <b>1 MB, 0.45 MB of it seven screenshots in base64</b>: a 123k-token prompt read as
+        ~340k &mdash; 85% of Luna's 400k window &mdash; so the rest of the turn went to Sol:
+        <b>$2.07, 63% of the day's spend</b>, against $0.41 for the same tokens on Luna. Images
+        now count as a fixed 2,500 tokens each, and the same request reads as ~207k.
+      </p>
+    </div>
+  </section>
+
+  <!-- =============================================== update: all live runs + cache lesson -->
+  <section>
+    <h2>Five live runs, and the one that lost money</h2>
+    <p>
+      &ldquo;Saved&rdquo; compares each run with sending every request to the model it asked
+      for. Caches are per model, so that comparison has to give the expensive model the
+      cache it <em>would</em> have kept warm &mdash; otherwise a switch's cold write shows up
+      as a saving.
+    </p>
+
+    <div class="card">
+      <header>
+        <span class="grade exact">Measured live</span>
+        <span class="what">pass-through mode, each run's own ledger, API-equivalent cost</span>
+      </header>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Run</th><th>Requests</th><th>Sent low</th><th>Saved vs all-high</th></tr></thead>
+          <tbody>
+            <tr class="hl"><td>Codex, luna/sol &mdash; today's call (bug included)</td><td class="n">116</td>
+              <td class="n">96 (83%)</td><td class="n up">56.1%</td></tr>
+            <tr><td>Codex, luna/sol &mdash; 0xFF, <code>ls tasks</code>, then a deadlock question</td><td class="n">7</td>
+              <td class="n">5 (71%)</td><td class="n up">53.5%</td></tr>
+            <tr><td>Codex, luna/sol &mdash; <code>ls tasks</code>, then a hard question that spawned 8 sub-agents</td><td class="n">113</td>
+              <td class="n">22 (19%)</td><td class="n up">16.1%</td></tr>
+            <tr><td>Claude Code, sonnet/opus &mdash; easy messages with sub-agents</td><td class="n">8</td>
+              <td class="n">8 (100%)</td><td class="n up">40.0%</td></tr>
+            <tr><td>Claude Code, sonnet/opus &mdash; 2 easy messages (one ran a tool), 1 hard</td><td class="n">4</td>
+              <td class="n">3 (75%)</td><td class="n down">&minus;46.3%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="callout">
+      <p>
+        <strong>Why the last row lost money.</strong> Claude Code opens every session with the
+        same ~52k-token prompt, and each model caches its own copy. The one message routed to
+        Opus found Opus cold and paid a <b>66k-token write, $0.41</b>. Had everything gone to
+        Opus, that prefix would have been read from cache for <b>$0.03</b>, plus <b>$0.09</b>
+        for the rest. The cold write's extra <b>$0.30</b> is more than the <b>$0.11</b> the
+        three Sonnet requests saved. This row was first reported as <b>16.3% saved</b>; an
+        adversarial review of the ledger found the comparison pricing that cold write as if
+        Opus would have paid it anyway.
+      </p>
+    </div>
+
+    <div class="takeaway">
+      <p><strong>Routing down saves the whole price gap</strong> (40% for Sonnet under Opus)
+      &mdash; but every model you route to needs its own warm cache, and on short Claude Code
+      sessions that second cache costs more than the cheaper model saves. Codex pays less of
+      it: most of its cache is per session, though new Codex sessions still opened with
+      2.8k&ndash;13k tokens already cached.</p>
+    </div>
+  </section>
+
+  <!-- =============================================== update: Chinese -->
+  <section>
+    <h2>Chinese prompts no longer go to the cheap model by default</h2>
+    <p>
+      The heuristic's markers were English, and it measured length in space-separated words
+      &mdash; so a Chinese message fired almost nothing and counted as only a few words: the
+      old router sent just 13 of 81 hard Chinese messages high. It now reads Chinese
+      renderings of every English marker and counts <b>1.5 Han characters as a word</b> (the
+      central estimate across FLORES, WMT and TICO-19 parallel text). English scores are
+      pinned by a test and did not move.
+    </p>
+
+    <div class="card">
+      <header>
+        <span class="grade exact">Measured</span>
+        <span class="what">208 natural zh/en message pairs, written by agents who never saw the router</span>
+      </header>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Router</th><th>Hard sent high</th><th>Routine sent high</th><th>Same side as English</th></tr></thead>
+          <tbody>
+            <tr class="dim"><td>the same messages in English</td><td class="n">60 / 81</td><td class="n">29 / 127</td><td class="n">&mdash;</td></tr>
+            <tr><td>English-only router, on the Chinese</td><td class="n down">13 / 81</td><td class="n">15 / 127</td><td class="n">70.7%</td></tr>
+            <tr><td>Chinese support, as first frozen</td><td class="n">59 / 81</td><td class="n">27 / 127</td><td class="n">88.9%</td></tr>
+            <tr class="hl"><td><b>Chinese support, after two reviews</b></td><td class="n up">57 / 81</td><td class="n">27 / 127</td><td class="n up">90.9%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="body">
+        <p class="note">
+          Pre-registered before any translation existed, the 36-item test passed at the margin
+          (33/36 and 34/36 against a bar of 33). Two adversarial review rounds then raised 171
+          findings (157 verified, some overlapping); the largest class was <b>word-boundary
+          straddles</b> &mdash; Chinese has no spaces, so <span class="zh" lang="zh">改一下标题</span>
+          (&ldquo;edit the title&rdquo;) contains <span class="zh" lang="zh">下标</span>
+          (&ldquo;index&rdquo;). All fixed, but honestly: the fixes did not move parity on
+          natural traffic &mdash; the frozen version already scored 88.9% here, and the last 2
+          points came from two reverts this same sample prompted.
+        </p>
+      </div>
+    </div>
+
+    <div class="strip">
+      <div class="stat"><span class="n">507</span><span class="l">real Chinese Codex messages from the owner's history</span></div>
+      <div class="stat"><span class="n fit">26%&thinsp;&rarr;&thinsp;38%</span><span class="l">sent to the expensive model, current router</span></div>
+      <div class="stat"><span class="n">0</span><span class="l">moved from high to low</span></div>
+    </div>
+  </section>
+
+  <!-- =============================================== update: hardening -->
+  <section>
+    <h2>Reviewed before it carried a login</h2>
+    <p>
+      The pass-through proxy holds the user's login header in memory on every request, so it
+      went through an 11-agent review before it was pushed. Every finding of medium or high
+      severity was reproduced, then fixed test-first.
+    </p>
+    <div class="card">
+      <header>
+        <span class="grade warn">Found and fixed</span>
+        <span class="what">each one reproduced before the fix</span>
+      </header>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>What could go wrong</th><th style="text-align:left">Now</th></tr></thead>
+          <tbody>
+            <tr><td>An HTTP proxy set in the environment or macOS carries the login off the machine</td>
+              <td class="l">never uses one; binds to loopback only</td></tr>
+            <tr><td>An upstream redirect re-sends the login header to another host</td>
+              <td class="l">redirects are relayed, never followed</td></tr>
+            <tr><td>A token appears in a logged upstream error</td>
+              <td class="l">token-shaped strings redacted</td></tr>
+            <tr><td>A sub-agent's first message moves the parent's task to the other model</td>
+              <td class="l">choices kept per conversation, not per session</td></tr>
+            <tr><td>A full disk truncates the response the client is waiting for</td>
+              <td class="l">accounting can fail; the response cannot</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="takeaway">
+      <p><strong>Ranked by what the numbers support, updated:</strong> fix caching first (78%,
+      no quality risk). For a coding agent, pass-through routing on one provider saved
+      16&ndash;56% across four live runs &mdash; but on short Claude Code sessions it lost 46%
+      to a second cold cache, so measure it on your own sessions before trusting it. Watch
+      what gets routed, not just the average: today's biggest cost was a proxy bug that sent
+      a screenshot-heavy turn to the expensive model, found by reading the ledger and fixed
+      the same day.</p>
+    </div>
+  </section>
+
   <footer>
     <p>
-      Every figure here comes from a live run &mdash; 555 calls, $0.2572 of real spend, on
+      Every benchmark figure in the scorecard comes from three live runs &mdash; 1,661 calls, $0.7633 of real spend, on
       <code>claude-haiku-4-5</code> and <code>claude-opus-5</code>. Cost is computed from
       <code>response.usage</code> with cache reads at 0.10&times; and writes at 1.25&times;;
       latency is wall-clock across all legs; accuracy is deterministic short-answer grading
-      with the confidence intervals shown.
+      with the confidence intervals shown. The pass-through Codex costs use OpenAI's cached-input
+      rate with no write premium; the Chinese-prompt figures are offline heuristic scores, with
+      no model calls.
     </p>
     <p style="margin-top:12px">
-      <b>Limits.</b> 36 tasks, one workload, one run, short-answer grading only. Model
+      <b>Limits.</b> 36 tasks, one workload, three runs, short-answer grading only. The pass-through
+      runs are single live sessions, not benchmarks, priced API-equivalent. Model
       nondeterminism means the &ldquo;oracle&rdquo; row is not a strict upper bound — it probes
       models in sequence and can lose a task another strategy happened to win. Reproduce with
       <code>uv run dms bench --two-tier --mode record</code>.

@@ -454,14 +454,15 @@ already sent, after a switch within a session; and the prefix every session shar
 Code's system prompt and tools, sized by the largest cache read any session opened with) when
 routing had left a model unused. Otherwise a switch's cold write shows up as a *saving*.
 
-**Verified live** with `codex exec` and `claude -p` (the interactive TUIs send the same
-requests; they were not driven directly):
+**Verified live** with the interactive Codex TUI (`codex-dms`), `codex exec` and `claude -p`
+(Claude Code's interactive TUI has not been driven through the proxy):
 
 | run | requests | routed low | saved vs all-high |
 |---|---:|---:|---:|
-| Codex, Luna/Sol — `ls tasks`, then a design question | 7 | 5 (71%) | **53.5%** |
-| Codex, Luna/Sol — a hard question that spawned 8 sub-agents | 113 | 22 (19%) | **16.1%** |
-| Claude Code, Sonnet/Opus — 3 easy messages, 1 hard | 4 | 3 (75%) | **−46.3%** (cost more) |
+| Codex TUI, Luna/Sol — a browser task that placed a real RingCX call (bug below included) | 116 | 96 (83%) | **56.1%** |
+| Codex, Luna/Sol — 0xFF, `ls tasks`, then a deadlock question | 7 | 5 (71%) | **53.5%** |
+| Codex, Luna/Sol — `ls tasks`, then a hard question that spawned 8 sub-agents | 113 | 22 (19%) | **16.1%** |
+| Claude Code, Sonnet/Opus — 2 easy messages (one ran a tool), 1 hard | 4 | 3 (75%) | **−46.3%** (cost more) |
 | Claude Code, Sonnet/Opus — 2 easy messages, each with a sub-agent | 8 | 8 (100%) | **40.0%** |
 
 Tool calls ran for real in every run, with correct results. In the sub-agent runs each
@@ -470,16 +471,23 @@ Sol through all 15 of its tool steps while one of its sub-agents ran on Luna.
 
 **Read the Claude Code rows together.** Routed down, a conversation saves the full price gap
 (40%). But Claude Code sends a ~52k-token prefix that every session shares, and each model
-keeps its own cache of it. In the third row the one message routed to Opus found Opus cold
+keeps its own cache of it. In the fourth row the one message routed to Opus found Opus cold
 and paid a 66k-token write ($0.41); an all-Opus run would have read the shared 52k from
-cache ($0.03) and written only the other 14k ($0.09). That difference is more than the three
-Sonnet messages saved. (This row was first reported here as *16.3% saved*;
+cache ($0.03) and written only the other 14k ($0.09). The cold write's extra $0.30 is more than
+the $0.11 the three Sonnet requests saved. (This row was first reported here as *16.3% saved*;
 the review behind this revision found the counterfactual was pricing that cold write as if
 Opus would have paid it anyway.) Splitting traffic means keeping two caches warm, and with
 short sessions the second cache costs more than the cheaper model saves — the
-routing-versus-caching tension from the top of this README, measured live. Codex does not
-pay this across sessions: its cache is keyed per session, so no session opens warm to begin
-with.
+routing-versus-caching tension from the top of this README, measured live. Codex pays less of
+it: most of its cache is per session, though new Codex sessions still opened with 2.8k–13k
+tokens already cached.
+
+**The context guard and screenshots.** A conversation too big for the low model's window
+stays on the high one. The guard estimated size as request bytes ÷ 3, and in the first row a
+browser task's request grew to 1 MB — 0.45 MB of it seven base64 screenshots — for a
+123k-token prompt: it read as ~340k, 85% of Luna's 400k window, and the rest of the turn
+went to Sol (19 requests, $2.07 of the day's $3.30; the same tokens cost $0.41 on Luna).
+Images now count as a fixed 2,500 tokens each; the same request reads as ~207k.
 
 **Security.** The proxy binds only to `127.0.0.1` (behind it sits your logged-in router),
 never uses an HTTP proxy the environment or macOS configures, relays redirects instead of
