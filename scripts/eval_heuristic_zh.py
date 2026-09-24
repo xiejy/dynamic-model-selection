@@ -6,9 +6,10 @@
 Zero API calls. Compares the 36 workload prompts with two independent Chinese
 translations (tasks/workload.zh-formal.jsonl, tasks/workload.zh-casual.jsonl),
 for the router as it is now and for the English-only router it replaced. Also
-re-checks the English gate, and scores the adversarial review's 250 zh/en pairs
-(tasks/zh-review-pairs.jsonl) -- in-sample for the post-hoc fixes, so reported,
-never part of the verdict.
+re-checks the English gate, and reports -- never as part of the verdict -- two
+more pair sets: the first adversarial review's 250 zh/en pairs
+(tasks/zh-review-pairs.jsonl, in-sample for the post-hoc fixes), and 208 natural
+pairs written by agents who never saw the router (tasks/zh-natural-pairs.jsonl).
 
 Pass bar: docs/heuristic-zh-prereg.md (written before any translation existed).
 """
@@ -127,23 +128,46 @@ def _english_gate() -> int:
     return mismatches
 
 
-def _report_pairs() -> None:
-    rows = _rows("zh-review-pairs.jsonl")
+def _side(scored: Scored, key: str) -> bool:
+    return scored[key][0] >= CUT
+
+
+def _pair_line(label: str, keys: list[str], en: Scored, zh: Scored, before: Scored) -> str:
+    agree = sum(_side(en, k) == _side(zh, k) for k in keys)
+    over = sum(_side(zh, k) and not _side(en, k) for k in keys)
+    under = sum(_side(en, k) and not _side(zh, k) for k in keys)
+    base = sum(_side(en, k) == _side(before, k) for k in keys)
+    return (f"  {label:<10} parity {agree}/{len(keys)} ({agree / len(keys):.0%})"
+            f"   zh-only high {over}, en-only high {under}   English-only router: {base}/{len(keys)}")
+
+
+def _score_pairs(rows: list[dict]) -> tuple[Scored, Scored, Scored]:
     en = _score_all({r["id"]: r["en"] for r in rows})
     zh = _score_all({r["id"]: r["zh"] for r in rows})
     with _english_only():
         before = _score_all({r["id"]: r["zh"] for r in rows})
+    return en, zh, before
+
+
+def _report_pairs() -> None:
+    rows = _rows("zh-review-pairs.jsonl")
+    en, zh, before = _score_pairs(rows)
     print(f"\n== adversarial review pairs ({len(rows)}; in-sample for the post-hoc fixes) ==")
     for source in ("fp-hunter", "fn-hunter"):
         keys = [r["id"] for r in rows if r["id"].startswith(source)]
-        side = lambda s, k: s[k][0] >= CUT
-        agree = sum(side(en, k) == side(zh, k) for k in keys)
-        over = sum(side(zh, k) and not side(en, k) for k in keys)
-        under = sum(side(en, k) and not side(zh, k) for k in keys)
-        base = sum(side(en, k) == side(before, k) for k in keys)
-        print(f"  {source}  parity {agree}/{len(keys)} ({agree / len(keys):.0%})"
-              f"   zh-only high {over}, en-only high {under}"
-              f"   English-only router: {base}/{len(keys)}")
+        print(_pair_line(source, keys, en, zh, before))
+
+
+def _report_natural() -> None:
+    rows = _rows("zh-natural-pairs.jsonl")
+    en, zh, before = _score_pairs(rows)
+    print(f"\n== natural pairs ({len(rows)}; written blind to the router) ==")
+    print(_pair_line("all", [r["id"] for r in rows], en, zh, before))
+    for level in ("hard", "routine"):
+        keys = [r["id"] for r in rows if r["difficulty"] == level]
+        print(f"  {level:<10} sent high: English {sum(_side(en, k) for k in keys)}/{len(keys)}"
+              f"   Chinese {sum(_side(zh, k) for k in keys)}/{len(keys)}"
+              f"   English-only router on the Chinese {sum(_side(before, k) for k in keys)}/{len(keys)}")
 
 
 def _report_real(path: Path, score: Callable[[dict[str, str]], Scored]) -> None:
@@ -174,8 +198,9 @@ def main(argv: list[str] | None = None) -> int:
         zh = _score_all(zh_text)
         with _english_only():
             baseline = _score_all(zh_text)
-        print(f"\n[{name}] Han characters per English word, whole prompts (payloads stay English, so this understates): {_ratio(en_text, zh_text):.2f}"
-              f" (router uses {HAN_CHARS_PER_WORD})")
+        print(f"\n[{name}] Han characters per English word over whole prompts: "
+              f"{_ratio(en_text, zh_text):.2f} (payloads stay English, so this understates;"
+              f" the router uses {HAN_CHARS_PER_WORD})")
         verdicts.append(_report_set(name, en, zh, baseline))
 
     mismatches = _english_gate()
@@ -183,6 +208,7 @@ def main(argv: list[str] | None = None) -> int:
     passed = all(verdicts) and mismatches == 0
     print(f"OVERALL: {'PASS' if passed else 'FAIL'}  (both sets and the English gate; see the pre-registration)")
     _report_pairs()
+    _report_natural()
     if args.real:
         _report_real(args.real, _score_all)
     return 0 if passed else 1

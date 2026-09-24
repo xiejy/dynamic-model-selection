@@ -62,4 +62,137 @@ Chinese Codex prompts before and after (aggregate counts only — the prompts st
 
 ---
 
-# Results — to be added after the run. Everything above stays unchanged.
+# Results — added 2026-09-24, after the run. Everything above is unchanged.
+
+Procedure as run: pre-registration committed `7e20745` (10:27); vocabulary and length rule
+frozen in `a26576c` (10:59), with all 60 English prompts pinned by a test; then
+`scripts/eval_heuristic_zh.py` run once. The translations were visible to me when the
+inputs workflow returned, before the merge — the case the last weakness above anticipated.
+The merge rules I applied were the ones stated in `heuristic_zh.py`'s docstring, decided
+from the two lexicons and their stated risks.
+
+## Verdict: PASS — at the margin
+
+| | formal | casual | bar |
+|---|---:|---:|---|
+| parity (same side of 1.0 as English) | **33/36** | **34/36** | ≥ 33 |
+| sent high (English: 21) | 24 (**+3**) | 23 (+2) | within ±3 |
+| English-only router, parity | 25/36 | 28/36 | — |
+| English-only router, sent high | 10 | 15 | — |
+| English gate (60 frozen prompts) | unchanged | | hard gate |
+
+The formal set passes with no slack on either criterion. Every disagreement errs toward
+the expensive model; none sends a prompt low that English sends high:
+
+- **h07** (both sets) — 最坏情况 fires *worst-case*; the English prompt writes "worst case"
+  without the hyphen, which the English list does not match. h07 is a *hard* task, so the
+  Chinese routing is the better one; the gap is the English list's narrowness.
+- **e10** (both sets) — formal: 语义化版本 is the ordinary Chinese for "semantic version"
+  and is rendered as *semver*; the English prompt spells out "semantic version", which does
+  not fire. *Corrected after review:* the casual e10 is not the vocabulary at all — that
+  translator wrote the English word "semver" inline, which the English list itself matches
+  (the English-only router fires on it too). A translation added a router keyword.
+- **m05** (formal only) — the formal translation is wordier than the English and crosses
+  the 35-word length line.
+
+Per-signal agreement: 31–36 of 36 per signal in both sets (`long_prompt` weakest in the
+formal set, 31/36).
+
+## Reported alongside
+
+- **Characters per word.** Over whole prompts the translations run 1.30 (formal) and 0.97
+  (casual) Han characters per English word — understated, because log lines, JSON and code
+  stay in English, and the casual set keeps English terms inline. The router's 1.5 comes
+  from the sources, not from these.
+- **The owner's own Chinese Codex prompts** (507 distinct typed messages with Chinese, from
+  local rollouts; content never leaves the machine): sent high **26% → 39%**; 66 moved
+  low → high, none high → low. Length alone moved 15; the other 51 gained a vocabulary
+  signal. A private read of the 16 short ones that moved found mostly genuine *why /
+  explain / derive* questions, and at least one straddle bug: 搜索引擎 ("search engine")
+  contains 索引 ("index").
+
+---
+
+# Post-hoc — everything below came after the pre-registered measurement
+
+The verdict above stands as measured. What follows changed the router afterwards; each
+change is reported with its effect, and none is part of the verdict.
+
+## Two disclosures
+
+- **About a third of the original test sentences were phrased after the translations.**
+  14 of the 42 original "fires" test strings share a run of 6+ characters with a translation
+  (e.g. 从 256 个元素开始, 哪种编程语言使用 .rs 文件扩展名). The *patterns* came from the two
+  blind vocabulary builders, and the merged lexicon passed those tests on its first run
+  without edits — but the test list is not independent of the measurement items.
+- **The merge inputs are now in the repo**: `docs/heuristic-zh/lexicon-precision.json`,
+  `lexicon-recall.json`, and the length sources in `chars-per-word-sources.json`.
+
+## Why the 36-item test could not see the problems
+
+Of 36 items, the English-only router already agreed on 25 (formal) and 28 (casual):
+shared English payloads carry them. The vocabulary only mattered on 11 and 8 items — it
+fixed 11/11 and 7/8, and broke 3 and 1. Nothing in the set is routine casual chat, and
+nothing probes word boundaries.
+
+## Round 1 — adversarial review (8 agents: 4 finders, 4 verifiers)
+
+54 findings, about 45 verified as real. The largest class: **word-boundary straddles**.
+Chinese is written without spaces, so a two-character marker matches across two words —
+一下+标题 contains 下标 ("index"), 开发+生产 contains 发生 ("occur"), 一下+界面 contains 下界
+("lower bound"). Also missing colloquial forms (怎么这么慢 as "why"), gaps that could not
+cross `v1.2` or `main.py`, half-width punctuation counted as words, a negative signal
+broader than its English marker, and traps that could never reach the guard they claimed
+to test. All fixed test-first (commit `eff62e9`).
+
+Effect, **in-sample** (these are the pairs the fixes were made against), on the review's
+250 zh/en pairs: routine prompts 52% → 95% parity, hard prompts 9% → 71%.
+
+## Round 2 — a fresh round, blind to round 1 (8 agents)
+
+- **Natural sample.** Two agents who never saw the router wrote 208 zh/en pairs of
+  everyday traffic (`tasks/zh-natural-pairs.jsonl`). This is the out-of-sample check.
+- **Fresh hunters and a code re-review**, forbidden to read round 1's findings.
+
+The code re-review found a **high-severity regression introduced in round 1**: a "what +
+noun" guard meant for 设置为什么值 also killed genuine whys whose subject follows 为什么
+(为什么类型检查不通过, 为什么中文会乱码). Also: pangu spacing (a space around every Latin
+token) used up the gap budget; the half-width punctuation rule was quadratic on long
+runs; the NFKC fold turned the exam blank （） into code. The hunters found more straddles
+and missing forms — 从上周开始 is "since", not "starting from"; an imperative 保证 is "make
+sure", not "guarantee". All verified findings fixed test-first, with two **reverts informed
+by the natural sample**: 偶发/偶现 and 啥原因/什么原因, added in round 1, are how Chinese says
+"intermittent" and "what causes" — which the English lists do not key.
+
+## The numbers that matter: the natural sample
+
+| router | parity | hard sent high | routine sent high |
+|---|---:|---:|---:|
+| English, on the English side | — | 60 / 81 | 29 / 127 |
+| English-only, on the Chinese side | 70.7% | 13 / 81 | 15 / 127 |
+| frozen (`a26576c`) | 88.9% | 59 / 81 | 27 / 127 |
+| round 1 (`eff62e9`) | 88.9% | 59 / 81 | 29 / 127 |
+| round 2 (final) | 90.9% | 57 / 81 | 27 / 127 |
+
+**Chinese support is the whole win** on real traffic: without it, 68 of 81 hard Chinese
+prompts went to the cheap model; with it, the split matches English almost exactly. **The
+post-hoc rounds did not move natural-traffic parity**: round 1 is flat, and round 2's +2
+points are the two reverts the sample itself informed. The review defects were real but
+rare in natural phrasing.
+
+Of the 19 remaining natural disagreements: 9 are length (the two languages' messages differ
+in verbosity, 6 one way and 3 the other); 5 are English-list accidents on the English side
+("improve" contains "prove" twice, "optimistic" contains "optimi", `$2.80` looks like code,
+"start with fix:" is a string prefix); 5 are translation choices (简单讲讲 written as
+"short version", 为啥 dropped from the English, `->` for 调到).
+
+## Limits
+
+This is keyword matching over unsegmented text. Two rounds of adversarial review kept
+finding straddles; each fix is a guard that could, in turn, block a legitimate phrasing
+(round 1's own regression is the example). Parity on natural traffic has plateaued around
+89–91%, bounded by translation choice and the English lists' own accidents rather than by
+missing vocabulary. Going further would mean segmenting Chinese into words (e.g. jieba)
+before matching — a dependency this demo does not take.
+
+Reproduce everything: `uv run python scripts/eval_heuristic_zh.py`.

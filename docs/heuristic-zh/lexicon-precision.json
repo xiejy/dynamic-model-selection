@@ -1,0 +1,295 @@
+{
+ "signals": [
+  {
+   "signal": "reasoning_markers",
+   "patterns": [
+    {
+     "pattern": "(?<![作成认認以因行改设設变變转轉分名即定称稱记記视視置])[为為](?:什[么麼]|啥|何)",
+     "english_source": "why (为什么 / 为啥 / 为何, Traditional 為什麼 / 為何)",
+     "false_positive_risk": "为 closes many common words (认为, 作为, 以为, 成为, 设为, 改为, 称为, 视为, 行为, 因为…), so 认为什么 / 作为什么角色 / 设为什么值 / 行为什么时候 would read as \"why\". The lookbehind blocks all of these. Cost: 这一行为什么报错 (why does this line error) is missed, because 行 has to be excluded for 行为 (behaviour)."
+    },
+    {
+     "pattern": "所以[为為](?:什[么麼]|啥|何)|因[为為]什[么麼](?![都也])",
+     "english_source": "why (restores two forms the first pattern's lookbehind removes: 所以为什么 \"so why\" and 是因为什么 \"because of what\")",
+     "false_positive_risk": "因为什么都没做 means \"because I did nothing\" (因为 + 什么都), not \"why\". Blocked by the (?![都也]) lookahead."
+    },
+    {
+     "pattern": "解[释釋](?![器型权權])|[讲講]解(?![员員])|[阐闡](?:述|明|[释釋])",
+     "english_source": "explain (解释, 讲解, 阐述 / 阐明 / 阐释)",
+     "false_positive_risk": "解释器 (interpreter), 解释型语言 (interpreted language), 最终解释权归…所有 (standard marketing fine print) and 讲解员 (museum guide) are all blocked. 可解释性 still fires, which matches English, since \"explainability\" contains \"explain\"."
+    },
+    {
+     "pattern": "(?:[请請]|并|並)[说說]明|[说說]明(?:一下|原因|理由|[为為]什[么麼]|[为為]何)",
+     "english_source": "explain (说明 used as a request: 请说明 / 并说明 / 说明一下 / 说明原因)",
+     "false_positive_risk": "说明 on its own is mostly a noun or \"shows\" (说明书 manual, 这说明… this shows…, 使用说明), so it only fires after a request word (请, 并) or before a reason-object (一下, 原因, 理由, 为什么)."
+    },
+    {
+     "pattern": "(?<![开開具职職入历歷份住产產验驗认認论論凭憑签簽])[证證]明(?![书書材信函人天年日白确確细細显顯文])",
+     "english_source": "prove (证明 / 證明)",
+     "false_positive_risk": "Two traps. (1) 证明 as a paperwork noun: 在职证明, 收入证明, 身份证明, 开证明, 出具证明, 证明材料, 证明书, 证明人. The lookbehind and lookahead block these. (2) Accidental 证明 across a word boundary: 验证明文 (verify plaintext), 保证明天 (promise tomorrow), 认证明细, 签证明年. Blocked by excluding the characters before 证 and the 明X words that follow (明天, 明年, 明白, 明确, 明细, 明显, 明文). 事实证明… (facts prove…) still fires, as English \"proved\" would."
+    },
+    {
+     "pattern": "推[导導](?!式)",
+     "english_source": "derive (推导 / 推導)",
+     "false_positive_risk": "列表推导式 is Python's list comprehension (a technical term, but not \"derive\"). Blocked by (?!式). 推出 (launch a product) and 导出 (export) were left out deliberately."
+    },
+    {
+     "pattern": "[权權]衡|取[舍捨]",
+     "english_source": "trade-off / tradeoff (权衡, 取舍)",
+     "false_positive_risk": "Low. Both words mean weighing one thing against another, and 权衡利弊 in everyday text is still a real trade-off. 折中 / 利弊 were left out as \"compromise\" / \"pros and cons\", not trade-off."
+    },
+    {
+     "pattern": "根本原因|根因",
+     "english_source": "root cause",
+     "false_positive_risk": "Bare 原因 (reason) is deliberately excluded. 根源 was also dropped because it is broader (幸福的根源, \"the root of happiness\")."
+    },
+    {
+     "pattern": "[复複][杂雜][度性]",
+     "english_source": "complexity (复杂度, 复杂性)",
+     "false_positive_risk": "Bare 复杂 (complicated, very common) is excluded; it needs 度 or 性. 问题的复杂性 in general prose fires, but English \"complexity\" is just as general."
+    },
+    {
+     "pattern": "死[锁鎖]",
+     "english_source": "deadlock, is deadlock",
+     "false_positive_risk": "Low. The reversed 锁死 (jammed / locked up, e.g. 手机锁死) does not match."
+    },
+    {
+     "pattern": "(?<![律度钻鑽策理管])漏洞(?!百出)|易[受被][^，。,.；;？?]{0,10}攻[击擊]",
+     "english_source": "vulnerable (存在…漏洞 / 有漏洞 / 容易受到…攻击 / 易被…攻击)",
+     "false_positive_risk": "Blocked non-security 漏洞: 法律漏洞 (legal loophole), 制度漏洞, 管理漏洞, 政策漏洞, 钻漏洞 (exploit a loophole) and the idiom 漏洞百出 (full of holes). The attack form uses a bounded gap that stops at punctuation."
+    },
+    {
+     "pattern": "最[坏壞差糟]情[况況形]",
+     "english_source": "worst-case",
+     "false_positive_risk": "English matches only the hyphenated, technical \"worst-case\". Everyday Chinese says 最坏的情况 (\"做好最坏的打算\", \"最坏的情况已经过去\"). Requiring no 的 between 最坏 and 情况 keeps the technical sense only."
+    },
+    {
+     "pattern": "下[确確]?界",
+     "english_source": "lower bound (下界, 下确界 infimum)",
+     "false_positive_risk": "下限 (lower limit; also slang 没有下限 \"shameless\") was left out. 下界 only means something else in fantasy writing (神仙下界, a god descending to earth)."
+    },
+    {
+     "pattern": "(?:被|遭)[违違][反背]|[违違][反背]了",
+     "english_source": "violated (past or passive only: 被违反, 违反了)",
+     "false_positive_risk": "English matches only \"violated\", not \"violate\". The pattern therefore needs the passive 被 or the perfective 了, so plain 违反交通规则 (violate traffic rules) does not fire. 违反了规则 does fire, as \"violated the rules\" would in English."
+    },
+    {
+     "pattern": "(?<![我量])保[证證](?![金书書人])",
+     "english_source": "guarantee (保证 / 保證)",
+     "false_positive_risk": "Blocked: 保证金 (deposit), 保证书 (written pledge), 保证人 (guarantor), 我保证 (\"I promise\", everyday speech) and 质量保证 (QA). 能否保证 / 无法保证 still fire."
+    },
+    {
+     "pattern": "(?<![没沒未不])(?<!没有)(?<!沒有)(?:指出|[给給]出)(?!了)[^，。,.；;？?]{0,10}(?:原因|bug|缺陷)",
+     "english_source": "name the cause, name the bug",
+     "false_positive_risk": "Only fires for a request (指出 / 给出 followed by 原因 / bug / 缺陷), not for a narrated event: 他没有给出原因 is blocked by the negation lookbehind and 指出了 by (?!了). 说出原因 (everyday \"say why\") and 指出错误 (a teacher pointing out mistakes) were deliberately left out."
+    },
+    {
+     "pattern": "[优優]化|最[优優](?![秀惠先美良雅质質])|最佳化",
+     "english_source": "optimi- (优化 optimise, 最优 optimal, Taiwanese 最佳化)",
+     "false_positive_risk": "Blocked 最优 words: 最优秀 (most excellent), 最优惠 (best discount), 最优先 (top priority), 最优美, 最优良, 最优雅, 最优质. 优化营商环境 in news text fires, matching English \"optimize\" in business prose."
+    },
+    {
+     "pattern": "理[论論](?:上|值|性|极限|極限|分析|[计計]算|最)",
+     "english_source": "theoretical (理论上, 理论值, 理论性, 理论极限, 理论分析, 理论最…)",
+     "false_positive_risk": "English \"theoretical\" does not match \"theory\", so bare 理论 is excluded: 跟他理论 (argue with him), 马克思主义理论, 理论和实践. Only adjectival or adverbial forms fire."
+    }
+   ]
+  },
+  {
+   "signal": "multi_step",
+   "patterns": [
+    {
+     "pattern": "重[复複](?:[执執]行|[进進]行|[调調]用|上述|以上|此|[这這]|[该該]|步[骤驟]|直到|\\s*[a-z\\d]+\\s*次|[一二两兩三四五六七八九十百千万萬几幾多]+次)|不[断斷]重[复複]",
+     "english_source": "repeat (重复执行 / 重复上述 / 重复 n 次 / 重复直到 / 不断重复)",
+     "false_positive_risk": "Bare 重复 mostly means \"duplicate\" (重复元素, 去除重复值, 不重复的元素), which English \"repeat\" would not match. So it only fires when followed by a process or count object, or after 不断."
+    },
+    {
+     "pattern": "反[复覆](?!无常|無常|横跳|橫跳)",
+     "english_source": "repeat (反复 / 反覆, \"repeatedly\")",
+     "false_positive_risk": "Blocked 反复无常 (fickle) and the slang 反复横跳 (flip-flopping). 反复强调 still fires, as English \"repeatedly\" contains \"repeat\"."
+    },
+    {
+     "pattern": "一步一?步|分步[骤驟]|按步[骤驟]",
+     "english_source": "step by step (一步一步, 一步步, 分步骤, 按步骤)",
+     "false_positive_risk": "The idiom 一步一个脚印 does not match. Bare 分步 was dropped because of 分步付款 (paying in instalments)."
+    },
+    {
+     "pattern": "逐步地?(?:推[导導]|推理|分析|[计計]算|解[释釋]|[说說]明|演示|展示|思考|求解|[执執]行|模[拟擬]|[讲講]解|[给給]出|列出|[跟追][踪蹤])",
+     "english_source": "step by step (逐步 + a reasoning or computation verb)",
+     "false_positive_risk": "In news and everyday prose 逐步 means \"gradually\" (逐步推进改革, 经济逐步恢复, 病情逐步好转), which is not the same idea. It therefore only fires before an allowlist of reasoning and computation verbs."
+    },
+    {
+     "pattern": "(?<!时间)(?<!時間)序列(?!化|[号號])",
+     "english_source": "sequence (序列)",
+     "false_positive_risk": "Blocked: 序列化 / 反序列化 (serialisation), 序列号 (serial number), 时间序列 (time series; English \"series\" is not \"sequence\")."
+    },
+    {
+     "pattern": "(?:依次|按?[顺順]序)(?:[执執]行|[进進]行|[调調]用|[应應]用|[处處]理)|一系列(?:操作|指令|步[骤驟]|[调調]用|事件)",
+     "english_source": "sequence (sequential execution: 依次执行, 顺序执行; \"a sequence of operations\": 一系列操作)",
+     "false_positive_risk": "Bare 依次 (请依次排队 in public notices) and bare 一系列 (一系列措施 in news) are excluded. Each only fires before an operation or step noun."
+    },
+    {
+     "pattern": "一共(?![享同用识識存])|[总總]共|(?<!公)共[计計](?![划劃算])|[总總][计計](?![划劃算])|合[计計](?![划劃算])",
+     "english_source": "in total (一共, 总共, 共计, 总计, 合计)",
+     "false_positive_risk": "Blocks accidental matches across word boundaries: 统一共享 (一共 + 享), 总计划 (master plan), 公共计划, 整合计划, 综合计算. 一共多少钱 in shopping talk still fires, which matches English \"how much in total\"."
+    },
+    {
+     "pattern": "每一?次|每[当當]",
+     "english_source": "each time (每次, 每一次, 每当)",
+     "false_positive_risk": "This is the same everyday phrase as in English. 我每次来 fires just as \"each time I come\" would."
+    },
+    {
+     "pattern": "[从從](?![来來未不而事])[^，。,.；;？?\\n]{0,10}[开開]始|[从從][^，。,.；;？?\\n]{0,8}(?:[节節][点點]|[顶頂][点點]|起[点點]|源[点點]|[状狀][态態]|根)[^，。,.；;？?\\n]{0,4}出[发發]",
+     "english_source": "starting from, start with (从…开始; graph or state 从节点…出发)",
+     "false_positive_risk": "Excluded 从 words that are not \"from\": 从来 / 从未 / 从不 (never), 从而 (thus), 从事 (engage in). The gap is bounded and stops at punctuation. 从…出发 only fires with a graph or state anchor (节点, 顶点, 起点, 源点, 状态, 根), because 从北京出发 / 从山脚出发 mean \"set off from\"."
+    },
+    {
+     "pattern": "(?<![可所])以[^，。,.；;？?\\n]{1,10}(?:开头|開頭|[为為]起[点點])",
+     "english_source": "start with (以…开头, 以…为起点)",
+     "false_positive_risk": "The lookbehind drops 可以 and 所以. The target is 开头 / 起点, not 开始, so 所以明天开始 does not fire. 从…开始 is already covered by the previous pattern."
+    },
+    {
+     "pattern": "(?:出[现現]|[发發]生)了?(?:[几幾]|多少)次|(?:出[现現]|[发發]生)的?(?:次[数數]|[频頻])|首次出[现現]|第一次出[现現]的(?:位置|下[标標]|索引)|(?:是否|[会會]不[会會]|何[时時])[会會]?[发發]生",
+     "english_source": "occur, occurrence (出现几次, 出现的次数, 出现频率, 首次出现, 是否会发生, 何时发生)",
+     "false_positive_risk": "Bare 出现 (appear, e.g. 他出现在门口) and bare 发生 (发生了什么事, \"what happened\") are extremely common and excluded. The pattern only fires on counting, frequency, first-occurrence, or \"whether/when does it occur\" forms."
+    },
+    {
+     "pattern": "[跟追][踪蹤][^，。,.；;？?]{0,6}(?:[执執]行|[调調]用|[变變]量|代[码碼]|程序|函[数數]|[栈棧]|循[环環]|[过過]程|流程|每一步|的值)|堆[栈棧][跟追][踪蹤]",
+     "english_source": "trace (跟踪 / 追踪 execution, variables, values; 堆栈跟踪 stack trace)",
+     "false_positive_risk": "Bare 跟踪 / 追踪 covers stalking (被人跟踪), parcel tracking (追踪快递) and follow-up news (追踪报道). It therefore needs a program-execution object within 6 characters."
+    },
+    {
+     "pattern": "最[终終]的?值|最[终終][^，。,.；;？?]{1,12}的值",
+     "english_source": "final value (最终值, x 的最终值, 最终 x 的值)",
+     "false_positive_risk": "最终结果 (final result) is excluded because English does not list it. 最后的值 (\"last value\", e.g. a list's last element) is excluded too. The gap is bounded and stops at punctuation."
+    }
+   ]
+  },
+  {
+   "signal": "simple_markers",
+   "patterns": [
+    {
+     "pattern": "(?:[请請]|中|里|裡)[提抽]取|[提抽]取(?:出|以下|下列|其中|所有|全部)",
+     "english_source": "extract the (请提取, 从…中提取, 提取出, 提取以下 / 所有)",
+     "false_positive_risk": "Bare 提取 / 抽取 covers withdrawing money (提取公积金, 提取现金), download codes (提取码), plant extracts (提取物) and lucky draws (随机抽取幸运观众). It only fires as a request (请) or with 从…中 / 出 / a quantifier object."
+    },
+    {
+     "pattern": "(?:哪|什[么麼])[一种種门門个個款]{0,2}(?:[编編]程|程序(?:[设設][计計])?|程式(?:[设設][计計])?)[语語]言",
+     "english_source": "which programming language (哪种编程语言, 什么程序设计语言, 哪種程式語言)",
+     "false_positive_risk": "Requires 编程 / 程序 / 程式, so 你会说什么语言 (\"what language do you speak\") does not fire."
+    },
+    {
+     "pattern": "[扩擴]展名|[后後][缀綴]名|文件[后後][缀綴]|副[档檔]名",
+     "english_source": "file extension (扩展名, 后缀名, 文件后缀, Taiwanese 副檔名)",
+     "false_positive_risk": "Bare 后缀 (suffix, as in 最长公共后缀, a string-algorithm term) is excluded; it needs 名 or 文件."
+    },
+    {
+     "pattern": "(?:[请請]|[进進]行|加以)[分归歸][类類]|(?<![可被以])[分归歸][类類](?:[为為]|成(?![本功熟员員])|到)",
+     "english_source": "classify the (请分类, 进行分类, 分类为, 归类到)",
+     "false_positive_risk": "Bare 分类 is usually the noun \"category\" (商品分类), so it needs a request or a target marker. Also blocked: descriptive 可分类为 / 被分类为 / 可以分类为 (\"can be classified as\"), and accidental matches with 分类成本 (classification cost) and 分类成功 (classification succeeded)."
+    },
+    {
+     "pattern": "(?:[给給]出|[写寫]出)[^，。,.；;？?\\n]{0,20}(?:git|shell|bash|[终終]端|命令行)\\s*(?:命令|指令)",
+     "english_source": "give the git command, give the shell command",
+     "false_positive_risk": "Bare 命令 is excluded; the pattern needs a request verb (给出, 写出) plus git / shell / terminal. 提供 was dropped because 文档提供的git命令 (\"the git command the docs gave\") is past narration."
+    },
+    {
+     "pattern": "(?:哪[个個条條一]|(?<![为為])什[么麼])\\s*(?:git|shell|bash)\\s*(?:命令|指令)|(?:git|shell|bash)\\s*(?:命令|指令)(?:是|[为為])(?:什[么麼](?!意思)|哪)",
+     "english_source": "give the git command, give the shell command (question form: 用什么/哪条 git 命令, git 命令是什么)",
+     "false_positive_risk": "为什么这个git命令会失败 (a hard debugging question) contains 什么…git命令. Blocked by the (?<![为為]) lookbehind. 这个git命令是什么意思 is a request to explain, not a lookup. Blocked by (?!意思)."
+    },
+    {
+     "pattern": "十[进進][制位]的?(?:值|[数數]值|表示)|十[进進][制位](?:是|[为為])(?:多少|[几幾])|[转轉](?:[换換])?(?:成|[为為])十[进進][制位]",
+     "english_source": "decimal value of (十进制值, 十进制表示, 十进制是多少, 转换成十进制; Taiwanese 十進位)",
+     "false_positive_risk": "Bare 十进制 (decimal system) is excluded; the pattern needs a value/representation or \"convert to\" form."
+    },
+    {
+     "pattern": "(?:多少|[几幾])[个個]?(?:字[节節]|位元組)",
+     "english_source": "how many bytes (多少字节, 几个字节, Taiwanese 位元組)",
+     "false_positive_risk": "Requires a question word, so 字节跳动 (ByteDance) and plain byte mentions do not fire."
+    },
+    {
+     "pattern": "(?:多少|[几幾])[个個]?\\s*kib",
+     "english_source": "how many kibibytes (多少 KiB)",
+     "false_positive_risk": "Negligible. 千字节 / KB (kilobyte) were not added, because English does not list \"kilobytes\"."
+    }
+   ]
+  },
+  {
+   "signal": "technical_terms",
+   "patterns": [
+    {
+     "pattern": "互斥(?:[锁鎖]|量|[体體])",
+     "english_source": "mutex (互斥锁, 互斥量, 互斥体)",
+     "false_positive_risk": "Bare 互斥 (mutually exclusive, e.g. 互斥事件 in probability) is excluded."
+    },
+    {
+     "pattern": "go\\s*[协協]程",
+     "english_source": "goroutine (Go 协程)",
+     "false_positive_risk": "Bare 协程 means coroutine in general (e.g. Python), and English \"goroutine\" does not match \"coroutine\". So it requires \"go\"."
+    },
+    {
+     "pattern": "ieee\\s?754",
+     "english_source": "ieee-754 (engineers usually write \"IEEE 754\" or \"IEEE754\" without the hyphen)",
+     "false_positive_risk": "Negligible. This slightly exceeds strict parity, since English only matches the hyphenated form. Drop it if you want an exact literal match."
+    },
+    {
+     "pattern": "正[则則](?![化项項])|正規表[达達示]式",
+     "english_source": "regex (正则, 正则表达式, Taiwanese 正規表示式)",
+     "false_positive_risk": "Blocked the ML term 正则化 / 正则项 (regularisation), which is a different concept."
+    },
+    {
+     "pattern": "最近最少使用|最近最久未使用",
+     "english_source": "lru",
+     "false_positive_risk": "Negligible."
+    },
+    {
+     "pattern": "(?<![a-z])b[+\\-]?\\s?[树樹]",
+     "english_source": "btree, b-tree (B树, B-树, B+树)",
+     "false_positive_risk": "The lookbehind stops mid-word matches like \"ab树\". B+树 is included as a B-tree variant, a slight widening."
+    },
+    {
+     "pattern": "副本(?:集|[节節][点點]|[数數]|同步|因子)|只[读讀]副本|[复複]制集",
+     "english_source": "replica (副本集, 副本数, 副本节点, 只读副本, 复制集)",
+     "false_positive_risk": "Bare 副本 is gaming slang for a dungeon (打副本, 刷副本) and also a document copy (文件副本). It only fires in replication compounds. A small residual risk remains from gamers saying 副本数量."
+    },
+    {
+     "pattern": "[幂冪]等",
+     "english_source": "idempotent (幂等 / 冪等)",
+     "false_positive_risk": "Negligible."
+    },
+    {
+     "pattern": "回溯(?:法|算法|搜索|搜尋|[实實]现)|(?:用|使用|灾难性|災難性|基于|基於)回溯",
+     "english_source": "backtracking (回溯法, 回溯算法, 用回溯, 灾难性回溯)",
+     "false_positive_risk": "Bare 回溯 also means looking back at history (回溯历史), so it needs an algorithm or usage anchor."
+    },
+    {
+     "pattern": "[闭閉]包",
+     "english_source": "closure (闭包 / 閉包)",
+     "false_positive_risk": "Negligible. 传递闭包 (transitive closure) fires, as English does."
+    },
+    {
+     "pattern": "[变變]基",
+     "english_source": "rebase (变基 / 變基)",
+     "false_positive_risk": "Negligible."
+    },
+    {
+     "pattern": "[语語][义義意]化?版本",
+     "english_source": "semver (语义化版本, 语义版本, Taiwanese 語意化版本)",
+     "false_positive_risk": "Negligible."
+    },
+    {
+     "pattern": "索引|下[标標](?![签簽])",
+     "english_source": "index (索引; array index 下标)",
+     "false_positive_risk": "下标签页 (\"the lower tab\") contains 下标 across a word boundary. Blocked by (?![签簽]). 指数 was left out on purpose (it means exponent or stock index)."
+    },
+    {
+     "pattern": "[递遞](?:[归歸]|迴)",
+     "english_source": "recursive (递归, Taiwanese 遞迴 / 遞歸)",
+     "false_positive_risk": "Negligible."
+    }
+   ]
+  }
+ ],
+ "notes": "I added 54 Chinese patterns across the four signals. All compile, and they pass 113 positive and 86 trap sentences I wrote myself. None of the trap sentences fires the signal it was written against (0 errors).\n\n**Testing**\n- **Everyday text:** across 20 paragraphs of ordinary Chinese, only three patterns fired, all where the English list would fire too: 一共多少钱 (\"in total\"), 我每次来 (\"each time\") and 优化营商环境 (\"optimize\"). Every other trap is blocked.\n- **Speed:** every quantifier is bounded, with no nested quantifiers. The worst single search on 50,000-character inputs built to cause backtracking took 0.016 s.\n- **Files:** the patterns are in /tmp/zh_vocab/patterns.py (a PATTERNS dict you can import) and the test sentences are in /tmp/zh_vocab/cases.py.\n- **Blindness:** I did not open anything under tasks/, tests/ or docs/, and did not read any prompt translation.\n\n**English markers with no Chinese pattern**\n- **cron, dockerfile:** Chinese engineers keep the English words, and the English substrings already match inside Chinese text. The obvious Chinese candidates (定时任务, 计划任务) mean \"scheduled job\" in general, which is broader than cron.\n- **Redundant ones:** \"is deadlock\" is already covered by 死锁. \"trade-off\" / \"tradeoff\" and \"btree\" / \"b-tree\" each become one Chinese form.\n\n**Where I went beyond strict parity (easy to drop)**\n- **IEEE 754:** matches \"IEEE 754\" / \"IEEE754\" without the hyphen, which English does not.\n- **B+树:** counts as a B-tree.\n- **是否会发生 / 何时发生:** these fire for \"occur\", where English would only fire on the word itself.\n- **一系列操作:** fires for \"sequence\" (\"a sequence of operations\").\n\n**Known misses, accepted for precision**\n- **这一行为什么报错** (\"why does this line error\"): 行 has to be excluded because of 行为 (behaviour).\n- **Left out entirely:** colloquial 讲讲 / 说说 for \"explain\", 说出原因 and 指出错误 for \"name the cause/bug\", and bare 原因 / 出现 / 发生 / 命令 / 分类 / 重复 / 逐步 / 跟踪 / 副本 / 回溯.\n- **Plain 违反:** for \"violated\", only the 被违反 and 违反了 forms fire.\n\n**Two parity quirks to know**\n- **Tense:** English \"violated\" and \"theoretical\" do not match \"violate\" or \"theory\", so the Chinese patterns are limited to the passive/perfective and the adjectival forms.\n- **Hyphen:** English \"worst-case\" needs the hyphen, so only the technical 最坏情况 fires, not everyday 最坏的情况."
+}

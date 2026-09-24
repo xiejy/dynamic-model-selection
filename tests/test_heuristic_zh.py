@@ -226,21 +226,19 @@ POST_HOC_FIRES = [
     ("reasoning_markers", "这两者之间怎么折中"),
     ("reasoning_markers", "理论 QPS 能到多少"),
     ("reasoning_markers", "这次改动破坏了循环不变式"),
-    ("multi_step", "从 v1.2 版本开始就这样"),                    # '.' inside a version number
+    ("multi_step", "从 index.ts 这个文件开始看"),               # '.' inside a file name
     ("multi_step", "从 main.py 开始看"),
     ("multi_step", "跟踪 processIncomingRequest 的执行"),
     ("multi_step", "跟踪一下这个请求"),
     ("multi_step", "逐步排查一下"),
     ("multi_step", "从不同的节点开始遍历"),                     # 从不同 is not 从不
-    ("multi_step", "从这个版本起"),
+    ("multi_step", "从第 5 行起"),
     ("multi_step", "画个登录的时序图"),
     ("technical_terms", "多副本之间怎么同步"),
     ("technical_terms", "数据复制延迟很高"),
     ("technical_terms", "从库查询很慢"),
     # second pass over what the review pairs still missed
     ("reasoning_markers", "这个原子操作为何在 ARM 上不生效"),     # 操作 + 为何, not 作为
-    ("reasoning_markers", "这个 pod 一直重启是啥原因"),
-    ("reasoning_markers", "接口偶尔超时，什么原因"),
     ("reasoning_markers", "干嘛这么设计"),
     ("reasoning_markers", "请指出这段 C 代码中可能导致内存泄漏的缺陷"),   # an 18-unit gap
     ("multi_step", "跟一下这个请求的调用链"),
@@ -248,7 +246,6 @@ POST_HOC_FIRES = [
     ("multi_step", "分步拆解一下状态转移"),
     ("multi_step", "分步算一下要多少台机器"),
     ("multi_step", "x 最后的值是多少"),
-    ("multi_step", "这个 bug 偶现"),                            # occurs intermittently
     ("multi_step", "重复到收敛为止"),
 ]
 
@@ -342,3 +339,128 @@ def test_rare_han_extensions_are_han() -> None:
     from dms.routers.heuristic_zh import has_han
 
     assert has_han("\U00030000") and has_han("\U0002f800") and has_han("〇")
+
+
+# ------------------------------------------ post-hoc, round 2 (fresh blind review)
+
+ROUND2_FIRES = [
+    ("reasoning_markers", "点了按钮之后为什么状态没有更新"),     # a noun right after 为什么 is its subject
+    ("reasoning_markers", "为什么类型检查过不了"),
+    ("reasoning_markers", "接口返回的为什么中文是乱码"),
+    ("reasoning_markers", "为什么时间戳差了8小时"),
+    ("reasoning_markers", "设置为什么不生效"),                   # 设置 + 为什么: still why
+    ("reasoning_markers", "我不确定为什么会这样"),
+    ("reasoning_markers", "改了配置怎么还是不生效"),             # colloquial why
+    ("reasoning_markers", "这个服务怎么一直重启"),
+    ("reasoning_markers", "日志怎么没有输出"),
+    ("reasoning_markers", "除了解释原因之外，还要给出修复方案"),
+    ("reasoning_markers", "请从原理解释一下 HTTPS 握手的过程"),
+    ("reasoning_markers", "结合这张架构图解释一下数据流向"),
+    ("reasoning_markers", "已知 a>0，b>0，求证 a+b>=2√(ab)"),
+    ("reasoning_markers", "试证：任意连通无向图都存在生成树"),
+    ("reasoning_markers", "请证明确实不存在更快的算法"),
+    ("reasoning_markers", "这段代码会不会被 SQL 注入"),
+    ("reasoning_markers", "按阿姆达尔定律，理论加速比是多少"),
+    ("reasoning_markers", "volatile变量保证原子性吗"),
+    ("reasoning_markers", "如何保证消息不丢失"),
+    ("reasoning_markers", "说一下这个报错的原因\n日志在下面"),
+    ("reasoning_markers", "说一下原因吧"),
+    ("reasoning_markers", "线程 t1 和 t2 锁死了"),               # pangu spacing
+    ("multi_step", "然后重复第 2 步，直到误差小于 0.01"),
+    ("multi_step", "失败的话重复上一步"),
+    ("multi_step", "重复直至收敛"),
+    ("multi_step", "请分步解答这道动态规划题"),
+    ("multi_step", "请逐步解答"),
+    ("multi_step", "这是报错的堆栈，帮我看看"),
+    ("multi_step", "堆栈信息如下"),
+    ("multi_step", "跟踪 ctx 和 req 两个变量"),                 # pangu spacing
+    ("multi_step", "从 0 开始计数"),
+    ("multi_step", "从头开始"),
+    ("multi_step", "请⼀步⼀步算这道题"),                       # Kangxi radical U+2F00 from a PDF
+    ("technical_terms", "MySQL 主从延迟很高怎么排查"),
+    ("technical_terms", "主从同步断了怎么恢复"),
+    ("technical_terms", "读副本会读到旧数据吗"),
+]
+
+ROUND2_TRAPS = [
+    ("reasoning_markers", "字符集应该设置为什么？"),             # set to what
+    ("reasoning_markers", "初始化为什么？"),
+    ("reasoning_markers", "翻译为什么比较好"),
+    ("reasoning_markers", "把这个回调改为什么都不做"),
+    ("reasoning_markers", "不管什么原因失败，都返回 500"),       # for whatever reason
+    ("reasoning_markers", "java.lang.OutOfMemoryError: Metaspace 一般是啥原因"),   # "what causes"
+    ("reasoning_markers", "跟产品讲下周的排期"),                 # 讲 + 下周
+    ("reasoning_markers", "先说明一下，这个项目用的是 python 3.8"),   # a preamble
+    ("reasoning_markers", "帮我写一份工作证明"),
+    ("reasoning_markers", "TS 的类型推导不出来"),                # type inference
+    ("reasoning_markers", "改完顺手推到 main 分支"),             # 顺手 + 推 (git push)
+    ("reasoning_markers", "有没有好用的漏洞扫描工具推荐"),
+    ("reasoning_markers", "改完之后保证测试能过"),               # make sure
+    ("reasoning_markers", "尽量保证代码整洁"),
+    ("reasoning_markers", "求这个函数的最优解"),                 # optimal is not optimi-
+    ("reasoning_markers", "我去跟产品求证一下需求"),             # verify with someone
+    ("reasoning_markers", "这个 bean 会被注入到哪个类"),         # dependency injection
+    ("multi_step", "从上周开始就一直报 502"),                   # since
+    ("multi_step", "从 v2.3 开始就不兼容了"),
+    ("multi_step", "从这个版本起"),
+    ("multi_step", "从日志看是 NPE 引起的"),
+    ("multi_step", "Rust 的开发生态怎么样"),                    # 开发 + 生态
+    ("multi_step", "跟下面的代码比较一下有什么区别"),           # 跟 = with
+    ("multi_step", "df 里的分数列有空值"),                      # 分数 + 列
+    ("multi_step", "按时间排序列出来"),                         # 排序 + 列出
+    ("multi_step", "grpc 偶发 DEADLINE_EXCEEDED"),              # intermittent
+    ("multi_step", "去除重复之前先排序"),                       # 重复 = duplicate
+    ("technical_terms", "如果数字为正则输出 yes"),               # 为正，则输出
+    ("technical_terms", "L2 正则系数怎么调"),                   # regularisation
+    ("technical_terms", "2 的 10 次幂等于多少"),                 # 幂 + 等于
+    ("technical_terms", "Excel 数据复制粘贴后格式乱了"),
+    ("technical_terms", "从库里导入数据"),                      # from the library
+    ("technical_terms", "探索引入新框架"),                      # 探索 + 引入
+    ("technical_terms", "看下标红的地方"),                      # 看下 + 标红
+    ("technical_terms", "上下标怎么打"),                        # sub/superscript
+    ("technical_terms", "从服务器下载文件"),
+    ("simple_markers", "为什么我的 VS Code 扩展名称在市场里显示不对"),   # an extension's name
+]
+
+
+@pytest.mark.parametrize("signal,prompt", ROUND2_FIRES)
+def test_round2_rendering_fires(signal, prompt) -> None:
+    assert signal in chinese_signals(prompt.lower())
+
+
+@pytest.mark.parametrize("signal,prompt", ROUND2_TRAPS)
+def test_round2_trap_does_not_fire(signal, prompt) -> None:
+    assert signal not in chinese_signals(prompt.lower())
+
+
+@pytest.mark.parametrize("prompt", ["这条SELECT语句为什么这么慢", "用def定义的函数", "grid【i】【j】 越界了"])
+def test_code_glued_to_chinese_is_code(prompt) -> None:
+    assert "contains_code" in _fired(prompt)
+
+
+@pytest.mark.parametrize("prompt", ["我国的首都是（）", "超时时间（可选）（默认 30 秒）", "分⑴⑵两种情况"])
+def test_chinese_typography_is_not_code(prompt) -> None:
+    """（） is an exam blank and ）（ back-to-back asides; ⑴ is a numbered list."""
+    assert "contains_code" not in _fired(prompt)
+
+
+def test_punctuation_after_chinese_punctuation_is_not_a_word() -> None:
+    assert word_count("（可选）, 默认开启") == pytest.approx(word_count("（可选），默认开启"))
+
+
+def test_smart_apostrophes_inside_english_words_are_kept() -> None:
+    """don’t is one word whether or not the message also contains Chinese."""
+    assert word_count("don’t 中文") == pytest.approx(1 + 2 / HAN_CHARS_PER_WORD)
+
+
+def test_kangxi_radicals_count_as_han() -> None:
+    assert word_count("⼀步") == pytest.approx(2 / HAN_CHARS_PER_WORD)
+
+
+def test_long_punctuation_runs_are_linear() -> None:
+    import time
+
+    started = time.perf_counter()
+    word_count("中" + "!" * 40_000)
+
+    assert time.perf_counter() - started < 0.5

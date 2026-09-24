@@ -486,6 +486,14 @@ never uses an HTTP proxy the environment or macOS configures, relays redirects i
 following them — each would let your login header leave localhost — and redacts
 token-shaped strings from the upstream error text it logs.
 
+**Chinese prompts.** The scorer's markers were English and it counted length in
+space-separated words, so a Chinese message scored ~0 and went to the cheap model however
+hard it was: on 208 natural zh/en pairs, the old router sent 13 of 81 hard Chinese prompts
+high, against 60 of 81 for the same prompts in English. With Chinese vocabulary and a
+Han-character length it sends 57 of 81 (routine: 27 of 127, English 29) — 91% parity, English
+scores unchanged. Pre-registered, reviewed twice, limits and all:
+[docs/heuristic-zh-prereg.md](docs/heuristic-zh-prereg.md).
+
 **Don't use Haiku as Claude Code's low model.** Claude Code shapes each request for the model
 it believes it is using. Haiku 4.5 rejected the Opus-shaped request three times — *adaptive
 thinking is not supported*, *does not support the effort parameter*, *role 'system' is not

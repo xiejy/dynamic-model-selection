@@ -1,0 +1,84 @@
+{
+ "chinese_chars_per_english_word": 1.5,
+ "range_low": 1.3,
+ "range_high": 1.7,
+ "sources": [
+  {
+   "url": "https://corpus.bfsu.edu.cn/Yiyan.pdf",
+   "claim": "Yiyan English-Chinese parallel corpus (Xu and Xu, Corpus Linguistics 2021, 8(1):149-151): 500 human-translated text pairs across 15 Brown-style genres, English original to Chinese. Totals: 1,005,249 English words and 1,625,701 Chinese characters, so 1.617 per word. Footnote 2 gives the counting rule: Han [一-龥] plus each Latin/number run counted as one, with punctuation excluded, so the pure-Han figure is slightly below 1.62. Per genre: news 1.69, editorials 1.69, reviews 1.89, religion 1.55, hobbies 1.55, popular lore 1.65, biography 1.63, government docs 1.52, academic 1.62, fiction 1.50-1.60, humor 1.50."
+  },
+  {
+   "url": "https://catalog.ldc.upenn.edu/LDC2000T50",
+   "claim": "LDC Hong Kong Hansards Parallel Text: '11.9 million English words and 18.15 million Chinese characters', about 1.53 characters per word. The Chinese is Traditional, the direction is mixed (each speech is translated from its original language into both English and Chinese), and the page does not say whether punctuation is counted."
+  },
+  {
+   "url": "https://www.linkedin.com/pulse/how-do-we-count-chinese-characters-translation-job-wallace-gu",
+   "claim": "Translator rule of thumb: 1,000 Chinese characters become about 600-700 English words (ZH->EN, 1.43-1.67 characters per word), and 1,000 English words become about 1,500-1,700 Chinese characters (EN->ZH). One real ZH->EN project: 5,062 characters became 3,163 words, 1.60 characters per word. Punctuation handling is not stated (MS Word character count)."
+  },
+  {
+   "url": "https://www.1stopasia.com/blog/word-count-vs-character-count-for-asian-languages/",
+   "claim": "EN->ZH: 1,000 English words become 1,300-1,800 characters (1.3-1.8). ZH->EN: 1,000 characters become 650-750 words (1.33-1.54). The two directions do not match. The article's general definition of a character count includes punctuation, but it never says that applies to the Chinese figures."
+  },
+  {
+   "url": "https://www.anycount.com/word-count-worldwide/word-count-in-oriental-languages/",
+   "claim": "Same ranges as 1StopAsia: EN->ZH 1,300-1,800 characters per 1,000 words, ZH->EN 650-750 words per 1,000 characters. A translator's comment gives EN->ZH 1,500-1,700 and ZH->EN 600-700."
+  },
+  {
+   "url": "https://davidsmithtranslation.com/articles/how-to-count-chinese-characters/",
+   "claim": "ZH->EN: 100 Chinese characters generally become about 70 English words (1.43), with a range of 60-80 (1.25-1.67). Other formulas cited are 1.5:1 or 2:1 depending on the document. The author notes he found no formal academic research. Numerals and English words are excluded from Word's 'Asian characters' count."
+  },
+  {
+   "url": "https://www.lingvo.cn/index.php/help-list/24-compare-prices",
+   "claim": "Chinese agency: English words to Chinese characters are 1:1.8 for general material (1,000 words become 1,800 characters) and 1:2.2 for legal documents. English words are counted with MS Word; punctuation handling for the Chinese count is not stated."
+  },
+  {
+   "url": "https://www.hnjjfy.com/yingyu/866.html",
+   "claim": "Chinese agency: Chinese characters to English words are 1.7-2.0:1, though its own worked examples give 1.6-1.8. By field: law/medicine 1.8-2.4, military/technology 1.8-2.5, environment/machinery/chemicals 1.5-2.0, economics/finance/fiction 1.5-2.0, prose/poetry about 1.2. Counting uses Word's '字符数（不计空格）' (character count excluding spaces), which includes punctuation, letters and digits."
+  },
+  {
+   "url": "https://m.fanyishang.com/content/detail.php?id=5568&cid=457",
+   "claim": "Chinese agency: English to Chinese is 1:1.6, 'one English word becomes 1.6 Chinese characters', described as a rough reference only."
+  },
+  {
+   "url": "https://www.sohu.com/a/412653441_100016892",
+   "claim": "Translators Association of China model service agreement, clause 1.5: under GB/T 19363.1-2008, Chinese-foreign translation is counted by Chinese '字符数/不计空格' (characters excluding spaces). This is the industry basis for Chinese counts: they include full-width punctuation and count each Latin letter or digit, so industry ratios are not Han-only."
+  },
+  {
+   "url": "https://docs.pingcode.com/ask/227810.html",
+   "claim": "MS Word's '中文字符和朝鲜语单词' (Chinese characters and Korean words) count includes full-width punctuation, so it overstates pure Han count. The [一-龥] wildcard search counts Han only."
+  },
+  {
+   "url": "https://github.com/facebookresearch/flores (data: https://dl.fbaipublicfiles.com/flores101/dataset/flores101_dataset.tar.gz)",
+   "claim": "My own count on FLORES-101 dev+devtest (eng vs zho_simpl, English Wikimedia source translated into Chinese, 2,009 segments, 42,819 words): 69,527 Han, so 1.62 Han per word. Adding CJK punctuation gives 1.78; all non-space characters give 1.95; per translated (non-copied, non-numeric) word, 1.68."
+  },
+  {
+   "url": "https://github.com/wmt-conference/wmt22-news-systems",
+   "claim": "My own count on WMT22 general test. en-zh (English original, human Chinese reference): 33,927 words and 49,968 Han, 1.47 (1.63 with punctuation, 1.80 all non-space). zh-en (Chinese original, human English reference): 48,305 words and 63,125 Han, 1.31 (1.44 with punctuation)."
+  },
+  {
+   "url": "https://github.com/wmt-conference/wmt23-news-systems",
+   "claim": "My own count on WMT23 general test. en-zh: 1.48 Han per word (1.64 with punctuation). zh-en (Chinese original): 1.34 (1.46 with punctuation)."
+  },
+  {
+   "url": "https://github.com/wmt-conference/wmt21-news-systems",
+   "claim": "My own count on WMT21 news test. en-zh with two independent human references of the same English source: refA 1.56, refB 1.62, so translator variance is about 4%. zh-en (Chinese original): 1.34 (1.48 with punctuation)."
+  },
+  {
+   "url": "https://tico-19.github.io/data/tico19-testset.zip",
+   "claim": "My own count on TICO-19 dev+test en-zh (COVID/medical, English to Chinese, 70,313 words): 1.55 Han per word overall. PubMed scientific subset: 1.50 Han per word, but 2.10 all non-space characters because gene names, acronyms and numbers stay in Latin script. Wikipedia subset: 1.60. Short doctor-patient dialog subset: 1.20."
+  },
+  {
+   "url": "https://github.com/python/python-docs-zh-cn/tree/3.14",
+   "claim": "My own count on the official Python 3.14 docs Chinese translation (.po files, non-fuzzy, 69k entries, 1.47M English words), technical documentation translated EN->ZH. Raw: 1.38 Han per word, because code identifiers and reST roles stay in English; all non-space characters give 3.52. With inline code/markup removed from both sides: 1.50 (1.63 with punctuation). Per translated word: 1.58. By section, prose-only: tutorial 1.42, library 1.50, reference 1.61, c-api 1.52."
+  },
+  {
+   "url": "https://object.pouta.csc.fi/OPUS-UNPC/v1.0/moses/en-zh.txt.zip",
+   "claim": "My own count on the first 63,742 aligned lines of the OPUS UN Parallel Corpus v1.0 en-zh (1.63M English words, 1990s UN records, mostly English original): 1.36 Han per word, 1.46 with punctuation, 1.84 all non-space. Document symbols, numbers and names are kept in Latin script. Per translated word: 1.44."
+  },
+  {
+   "url": "https://object.pouta.csc.fi/OPUS-News-Commentary/v16/moses/en-zh.txt.zip",
+   "claim": "OPUS News-Commentary v16 en-zh gives 2.18 Han per word, but I excluded it as unreliable. Spot checks show many-to-one misalignments, with extra Chinese sentences on a line and duplicated text such as a repeated name."
+  }
+ ],
+ "reasoning": "Central estimate: about 1.5 Han characters (punctuation excluded) per English word. Plausible range: 1.3-1.7. Rule of thumb: 1,000 English words is about 1,500 Han characters, and 1,000 Han characters is about 670 English words.\n\nFour things move the number, and they explain most of the disagreement between sources:\n\n1) Translation direction (the biggest systematic effect). Translated text runs longer than the original because translators make things explicit.\n- English original, Chinese translation: 1.47-1.62 Han per word. Measured values: FLORES 1.62, WMT21 1.56/1.62, WMT22 1.47, WMT23 1.48, TICO-19 1.55, Yiyan 1.62 (1.0M words, 15 genres).\n- Chinese original, English translation: consistently lower at 1.31-1.34 (WMT21/22/23 zh-en, about 160k words in total).\n- So for Chinese text written natively (not translated), about 1.35 Han per English-equivalent word fits best. For Chinese produced by translating English, about 1.55-1.6 fits best.\n\n2) Punctuation. Chinese full-width punctuation adds about 0.10-0.16 per English word, roughly 8-10% on top of Han.\n- Examples: FLORES goes from 1.62 to 1.78, WMT22 en-zh from 1.47 to 1.63, and Chinese-original text from 1.31-1.34 to 1.44-1.48.\n- The Chinese industry standard counts with Word's '字符数（不计空格）' (character count excluding spaces). That count includes punctuation and counts every Latin letter or digit as one character. The agency figures (1.6, 1.8, 1.7-2.0, 2.2 for legal) are therefore not Han-only.\n- My 'all non-space characters' measure, which is closest to Word's count, gives 1.8-2.0 for general EN->ZH text. That is consistent with the agencies' 1.6-2.0 once you allow for their rounding and domain mix.\n- The Yiyan corpus uses a Han + Latin-run count with no punctuation and lands at 1.62. That is essentially Han-only and agrees with the machine translation test sets.\n\n3) Untranslated Latin tokens (code, identifiers, numbers, document symbols, acronyms) lower the Han count in technical text.\n- Python docs: 1.38 raw, but 1.50 once inline code/markup is removed from both sides, and 1.58 per translated word. Their all-non-space count is 3.5, which shows that character counts including Latin text badly overstate length for code-heavy text.\n- UN documents: 1.36 raw, 1.44 per translated word.\n- PubMed abstracts: 1.50 Han, but 2.10 all non-space.\n- For technical prose mixed with code, Han-only ratios of about 1.35-1.5 per English word are typical. The Latin tokens should be counted separately as words.\n\n4) Genre and translator variance.\n- Yiyan per-genre range: 1.50 (humor) to 1.89 (reviews).\n- Two independent translators of the same WMT21 text differ by about 4% (1.56 vs 1.62).\n- Short conversational text is lower (TICO-19 medical dialog 1.20).\n- Agencies say legal text is higher (2.2, on a count that includes punctuation and Latin text).\n\nWhere sources disagree:\n- Agency direction pairs are often internally inconsistent. For example, 1StopAsia gives 1.3-1.8 for EN->ZH but 1.33-1.54 for ZH->EN. This fits the direction asymmetry measured above.\n- Agencies rarely say whether punctuation is counted. By the GB/T 19363.1 / Translators Association of China convention it usually is.\n- HK Hansards (1.53) is Traditional Chinese, mixed direction, with unclear punctuation handling.\n- OPUS News-Commentary (2.18) is misaligned and excluded.\n\nMethod for my own counts:\n- Han = Unicode CJK Unified Ideographs, including Extension A/B+ and compatibility ideographs.\n- English words = whitespace tokens containing at least one letter or digit. A Word-style count that also includes punctuation-only tokens changes results by under 1.5%.\n- Ratios are corpus totals (sum of Han / sum of words). Per-segment medians agree within about 0.03.\n\nWeighting it all: clean general EN->ZH data sits at about 1.47-1.62. Chinese-original data is about 1.33. Technical text with code is about 1.38-1.50. A central 1.5 with a 1.3-1.7 range covers native-Chinese and translated-Chinese text with Han-only counting. If a count includes punctuation, use about 1.65 (range 1.45-1.8).\n\nWork files are in /tmp/zhratio: count.py and count2.py are the counting scripts, zip_sample.py is the range-request sampler, and po_extract.py extracts the Python docs .po pairs."
+}
