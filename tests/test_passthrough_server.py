@@ -511,3 +511,25 @@ def test_a_client_hanging_up_mid_stream_is_recorded_quietly(rig, capsys) -> None
     events = ledger.read()
     assert len(events) == 1 and events[0].usage is None
     assert "Traceback" not in capsys.readouterr().err
+
+
+def test_screenshots_do_not_push_a_message_off_the_low_model(tmp_path) -> None:
+    """The live bug, end to end: megabytes of screenshots are not ~770k tokens."""
+    upstream = Upstream()
+    proxy = build_passthrough_server(
+        "127.0.0.1", 0, family="openai", upstream=upstream.origin,
+        selector=PassthroughSelector(family="openai", low=LOW, high=HIGH,
+                                     low_context_tokens=400_000),
+        ledger=Ledger(tmp_path / "u.jsonl"),
+    )
+    threading.Thread(target=proxy.serve_forever, daemon=True).start()
+    base = f"http://127.0.0.1:{proxy.server_address[1]}"
+    shot = "data:image/png;base64,iVBORw0KGgo" + "A" * 120 * 1024
+    images = {"type": "message", "role": "user",
+              "content": [{"type": "input_image", "image_url": shot} for _ in range(19)]}
+
+    _post(base, _codex_body(images, _user(EASY)))
+
+    assert json.loads(upstream.received[0]["body"])["model"] == LOW
+    proxy.shutdown()
+    upstream.server.shutdown()

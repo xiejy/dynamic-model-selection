@@ -32,7 +32,7 @@ from typing import Any
 from urllib.parse import urlsplit
 
 from dms.passthrough.ledger import Ledger, UsageEvent, _as_dict, summarise
-from dms.passthrough.select import PassDecision, PassthroughSelector, Tier
+from dms.passthrough.select import PassDecision, PassthroughSelector, Tier, prompt_bytes
 from dms.passthrough.usage import UsageSniffer
 from dms.pricing import PriceBook
 
@@ -223,7 +223,7 @@ class PassthroughHandler(BaseHTTPRequestHandler):
             return None, body
 
         decision = cfg["selector"].decide(payload, session_key(self.headers),
-                                          body_bytes=len(body))
+                                          body_bytes=prompt_bytes(body))
         if decision.tier is Tier.UNTOUCHED or decision.model == payload["model"]:
             return decision, body  # unchanged: forward the original bytes exactly
         # ASCII escapes keep an unpaired surrogate the client sent encodable.

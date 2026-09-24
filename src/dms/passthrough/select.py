@@ -37,6 +37,7 @@ from dms.routers.heuristic import HeuristicRouter
 
 CHARS_PER_TOKEN = 3.0     # conservative: overestimates tokens, so errs toward high
 CONTEXT_HEADROOM = 0.85   # leave room for the reply and estimation error
+IMAGE_TOKENS = 2_500      # per image: a generous ceiling for one screenshot
 MAX_PINS = 10_000         # conversations remembered; the oldest is forgotten first
 
 # Blocks a client wraps around or appends to the user's message. Tag names from
@@ -54,6 +55,13 @@ _INJECTED_LINE = re.compile(
 )
 # The Codex IDE extension puts the typed request last, under this heading.
 _TYPED_REQUEST = re.compile(r"^## My request(?: for Codex)?:[ \t]*$", re.MULTILINE)
+
+# A JSON string of base64 image data -- behind a data: URL (OpenAI, Codex) or as
+# an Anthropic image block's bare "data" -- known by the formats' own base64
+# signatures: PNG, JPEG, GIF, WebP.
+_IMAGE_BLOB = re.compile(
+    rb'"(?:data:image/[a-z0-9.+-]+;base64,)?(?:iVBORw0KGgo|/9j/|R0lGOD|UklGR)[A-Za-z0-9+/]*+={0,2}"'
+)
 
 _TEXT_PARTS = {"text", "input_text"}
 _TOOL_OUTPUT_ITEMS = {"function_call_output", "custom_tool_call_output"}
@@ -173,6 +181,22 @@ def _strip(text: str) -> str:
     if typed:
         text = text[typed.end():]
     return _INJECTED_LINE.sub("", _INJECTED_BLOCK.sub("", text)).strip()
+
+
+def prompt_bytes(raw: bytes) -> int:
+    """The request's size as the context guard should read it.
+
+    A screenshot is tens of kilobytes of base64 but a couple of thousand tokens.
+    Measured by bytes, a Codex browser task whose real prompt was 123k tokens --
+    a 1 MB request, 0.45 MB of it seven screenshots -- read as ~340k and was
+    pushed off a 400k-window model (2026-09-24). Each image now counts as
+    IMAGE_TOKENS; everything else -- encrypted reasoning included, which is
+    replayed into the context -- keeps its full size, so the estimate still errs
+    high (that request now reads as ~207k).
+    """
+    images = _IMAGE_BLOB.findall(raw)
+    blob_bytes = sum(len(m) for m in images)
+    return len(raw) - blob_bytes + int(len(images) * IMAGE_TOKENS * CHARS_PER_TOKEN)
 
 
 # ------------------------------------------------------------------- deciding

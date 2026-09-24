@@ -1,4 +1,6 @@
 """Per-request model choice for pass-through mode."""
+import json
+
 import pytest
 
 from dms.passthrough.select import (
@@ -282,3 +284,57 @@ def test_ide_context_around_the_typed_request_is_not_scored() -> None:
 ])
 def test_other_codex_wrappers_are_not_typed_text(injected) -> None:
     assert latest_user_text("openai", _codex(_user(EASY), _user(injected))) == EASY
+
+
+# --------------------------------------- screenshots and the context guard (live bug)
+
+
+def _screenshot(kb: int) -> str:
+    """A fake PNG as Codex's browser tools send it: base64 behind a data URL."""
+    return "data:image/png;base64,iVBORw0KGgo" + "A" * (kb * 1024)
+
+
+def test_screenshots_are_not_measured_by_their_bytes() -> None:
+    """Measured 2026-09-24: a browser task's request was 1 MB, 0.45 MB of it
+    screenshots, for a 123k-token prompt. At 3 bytes a token that read as ~340k,
+    85% of gpt-5.6-luna's 400k window, and the rest of the turn went to Sol."""
+    from dms.passthrough.select import prompt_bytes
+
+    images = [{"type": "input_image", "image_url": _screenshot(120)} for _ in range(19)]
+    body = json.dumps(_codex(_user(EASY), {"type": "message", "role": "user", "content": images},
+                             {"type": "function_call_output", "output": "ok " * 60_000})).encode()
+    selector = PassthroughSelector(family="openai", low=LOW, high=HIGH, low_context_tokens=400_000)
+    selector.decide(_codex(_user(EASY)), "s1")  # the typed message: low
+
+    step = selector.decide(json.loads(body), "s1", body_bytes=prompt_bytes(body))
+
+    assert len(body) > 2_300_000
+    assert "context" not in step.why and step.tier is Tier.LOW
+
+
+def test_each_image_still_counts_as_some_tokens() -> None:
+    from dms.passthrough.select import CHARS_PER_TOKEN, IMAGE_TOKENS, prompt_bytes
+
+    raw = json.dumps({"input": [{"image_url": _screenshot(200)}]}).encode()
+
+    assert prompt_bytes(raw) >= IMAGE_TOKENS * CHARS_PER_TOKEN
+    assert prompt_bytes(raw) < len(raw) / 10
+
+
+def test_other_long_blobs_keep_their_full_weight() -> None:
+    """Encrypted reasoning is replayed into the context; only images are discounted."""
+    from dms.passthrough.select import prompt_bytes
+
+    raw = json.dumps({"input": [{"encrypted_content": "gAAAA" + "b" * 200_000}]}).encode()
+
+    assert prompt_bytes(raw) == len(raw)
+
+
+def test_anthropic_image_blocks_are_images_too() -> None:
+    from dms.passthrough.select import prompt_bytes
+
+    block = {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg",
+                                         "data": "/9j/4AAQ" + "B" * 300_000}}
+    raw = json.dumps({"messages": [{"role": "user", "content": [block]}]}).encode()
+
+    assert prompt_bytes(raw) < len(raw) / 10
