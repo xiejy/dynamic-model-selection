@@ -18,7 +18,10 @@ from dataclasses import dataclass, field
 
 from dms.client import ModelClient
 from dms.routers.base import TIER_MODELS, Decision, Router
+from dms.routers.heuristic_zh import HAN_CHARS_PER_WORD, chinese_signals, word_count
 from dms.workload import Task
+
+__all__ = ["HAN_CHARS_PER_WORD", "HeuristicRouter", "Signal", "word_count"]
 
 # Signal vocabularies. Kept explicit and greppable rather than learned -- the
 # point of this router is that you can read it, audit it, and explain a decision.
@@ -79,18 +82,23 @@ class HeuristicRouter(Router):
 
     def score(self, prompt: str) -> tuple[float, tuple[Signal, ...]]:
         text = prompt.lower()
-        words = len(text.split())
+        words = word_count(text)       # Han characters count too (heuristic_zh)
+        zh = chinese_signals(text)     # empty for text with no Han characters
 
         signals = (
             Signal("long_prompt", 1.0, words > 35),
             Signal("very_long_prompt", 1.0, words > 70),
             Signal("contains_code", 1.0, bool(CODE_PATTERN.search(prompt))),
-            Signal("reasoning_markers", 1.5, _any_in(text, REASONING_MARKERS)),
-            Signal("multi_step", 1.5, _count_in(text, MULTI_STEP_MARKERS) >= 1),
-            Signal("technical_terms", 1.0, _count_in(text, TECHNICAL_TERMS) >= 1),
+            Signal("reasoning_markers", 1.5,
+                   _any_in(text, REASONING_MARKERS) or "reasoning_markers" in zh),
+            Signal("multi_step", 1.5,
+                   _count_in(text, MULTI_STEP_MARKERS) >= 1 or "multi_step" in zh),
+            Signal("technical_terms", 1.0,
+                   _count_in(text, TECHNICAL_TERMS) >= 1 or "technical_terms" in zh),
             # The only negative signal: explicit markers of a lookup/extraction
             # task pull the score back down.
-            Signal("simple_markers", -1.5, _any_in(text, SIMPLE_MARKERS)),
+            Signal("simple_markers", -1.5,
+                   _any_in(text, SIMPLE_MARKERS) or "simple_markers" in zh),
         )
         return sum(signal.contribution for signal in signals), signals
 

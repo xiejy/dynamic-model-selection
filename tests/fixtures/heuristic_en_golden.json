@@ -1,0 +1,348 @@
+{
+"e01": [
+-1.5,
+[
+"simple_markers"
+]
+],
+"e02": [
+-1.5,
+[
+"simple_markers"
+]
+],
+"e03": [
+-1.5,
+[
+"simple_markers"
+]
+],
+"e04": [
+-1.5,
+[
+"simple_markers"
+]
+],
+"e05": [
+-1.5,
+[
+"simple_markers"
+]
+],
+"e06": [
+1.0,
+[
+"technical_terms"
+]
+],
+"e07": [
+1.0,
+[
+"technical_terms"
+]
+],
+"e08": [
+-1.5,
+[
+"simple_markers"
+]
+],
+"e09": [
+0.0,
+[]
+],
+"e10": [
+0.0,
+[]
+],
+"e11": [
+-1.5,
+[
+"simple_markers"
+]
+],
+"e12": [
+1.5,
+[
+"reasoning_markers"
+]
+],
+"m01": [
+0.0,
+[]
+],
+"m02": [
+0.0,
+[]
+],
+"m03": [
+1.5,
+[
+"reasoning_markers"
+]
+],
+"m04": [
+2.5,
+[
+"contains_code",
+"reasoning_markers"
+]
+],
+"m05": [
+0.0,
+[]
+],
+"m06": [
+1.0,
+[
+"technical_terms"
+]
+],
+"m07": [
+2.5,
+[
+"reasoning_markers",
+"technical_terms"
+]
+],
+"m08": [
+1.0,
+[
+"technical_terms"
+]
+],
+"m09": [
+1.0,
+[
+"contains_code"
+]
+],
+"m10": [
+2.0,
+[
+"contains_code",
+"technical_terms"
+]
+],
+"m11": [
+0.0,
+[]
+],
+"m12": [
+1.0,
+[
+"contains_code"
+]
+],
+"h01": [
+2.5,
+[
+"long_prompt",
+"multi_step"
+]
+],
+"h02": [
+1.5,
+[
+"reasoning_markers"
+]
+],
+"h03": [
+2.5,
+[
+"reasoning_markers",
+"technical_terms"
+]
+],
+"h04": [
+2.5,
+[
+"contains_code",
+"reasoning_markers"
+]
+],
+"h05": [
+2.5,
+[
+"reasoning_markers",
+"technical_terms"
+]
+],
+"h06": [
+1.0,
+[
+"technical_terms"
+]
+],
+"h07": [
+0.0,
+[]
+],
+"h08": [
+1.0,
+[
+"technical_terms"
+]
+],
+"h09": [
+0.0,
+[]
+],
+"h10": [
+1.5,
+[
+"multi_step"
+]
+],
+"h11": [
+1.5,
+[
+"reasoning_markers"
+]
+],
+"h12": [
+2.5,
+[
+"multi_step",
+"technical_terms"
+]
+],
+"x00": [
+-1.5,
+[
+"simple_markers"
+]
+],
+"x01": [
+0.0,
+[]
+],
+"x02": [
+-1.5,
+[
+"simple_markers"
+]
+],
+"x03": [
+-1.5,
+[
+"simple_markers"
+]
+],
+"x04": [
+-1.5,
+[
+"simple_markers"
+]
+],
+"x05": [
+-1.5,
+[
+"simple_markers"
+]
+],
+"x06": [
+0.0,
+[]
+],
+"x07": [
+-1.5,
+[
+"simple_markers"
+]
+],
+"x08": [
+0.0,
+[]
+],
+"x09": [
+2.5,
+[
+"contains_code",
+"reasoning_markers"
+]
+],
+"x10": [
+0.0,
+[]
+],
+"x11": [
+1.0,
+[
+"technical_terms"
+]
+],
+"x12": [
+2.5,
+[
+"reasoning_markers",
+"technical_terms"
+]
+],
+"x13": [
+0.0,
+[]
+],
+"x14": [
+1.0,
+[
+"technical_terms"
+]
+],
+"x15": [
+0.0,
+[]
+],
+"x16": [
+1.5,
+[
+"reasoning_markers"
+]
+],
+"x17": [
+2.5,
+[
+"reasoning_markers",
+"technical_terms"
+]
+],
+"x18": [
+1.5,
+[
+"reasoning_markers"
+]
+],
+"x19": [
+2.5,
+[
+"reasoning_markers",
+"technical_terms"
+]
+],
+"x20": [
+1.5,
+[
+"multi_step"
+]
+],
+"x21": [
+2.5,
+[
+"multi_step",
+"technical_terms"
+]
+],
+"x22": [
+2.5,
+[
+"reasoning_markers",
+"technical_terms"
+]
+],
+"x23": [
+1.5,
+[
+"reasoning_markers"
+]
+]
+}
