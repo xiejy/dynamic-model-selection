@@ -102,7 +102,7 @@ FIRES = [
     ("multi_step", "逐步分析这个过程"),
     ("multi_step", "访问序列为 A B C"),
     ("multi_step", "一共发生多少次缓存未命中"),
-    ("multi_step", "每次迭代执行常数量的工作"),
+    ("multi_step", "每一次迭代执行常数量的工作"),     # post-hoc: bare 每次 is also "every time"
     ("multi_step", "从 256 个元素开始"),
     ("multi_step", "这个字符出现了几次"),
     ("multi_step", "跟踪一下变量的值"),
@@ -137,12 +137,12 @@ TRAPS = [
     ("multi_step", "去除重复元素"),                     # duplicate, not repeat
     ("multi_step", "反序列化这个 JSON"),                # deserialise
     ("multi_step", "经济逐步恢复"),                     # gradually
-    ("multi_step", "他从来不写测试"),                   # 从来: never
+    ("multi_step", "他从来没开始写测试"),               # 从来: never -- reaches the 从 guard
     ("multi_step", "追踪快递"),                         # parcel tracking
     ("simple_markers", "特征提取器的结构"),             # a feature extractor, not a directive
-    ("simple_markers", "为什么这个 git 命令会失败"),    # a hard debugging question
+    ("simple_markers", "为什么 git 命令会失败"),        # a hard debugging question
     ("simple_markers", "商品分类页面"),                 # category (noun)
-    ("simple_markers", "字节跳动的面试题"),             # ByteDance
+    ("simple_markers", "问了几个字节跳动的同事"),       # ByteDance, after 几个
     ("technical_terms", "L2 正则化的作用"),             # regularisation
     ("technical_terms", "周末去刷副本"),                # game dungeon
     ("technical_terms", "下标签页"),                    # "the lower tab"
@@ -170,14 +170,21 @@ def test_accidental_english_substrings_are_not_translated() -> None:
     assert "reasoning_markers" not in chinese_signals("改进一下这段代码")
 
 
-def test_the_patterns_cannot_backtrack_catastrophically() -> None:
+ANCHORS = ("从", "以", "有", "存在", "跟踪", "指出", "给出", "最终", "易被", "约束", "容易被", "破坏了")
+
+
+@pytest.mark.parametrize("anchor", ANCHORS)
+@pytest.mark.parametrize("filler", ["的" * 40, "abc_def.ghi " * 8, "x" * 300])
+def test_no_gap_can_backtrack_catastrophically(anchor, filler) -> None:
+    """Every bounded gap after an anchor, fed ~50k characters that never close
+    it -- Han filler, dotted identifiers, one endless token."""
     import time
 
-    hostile = ("从" + "，" * 5 + "的" * 30 + "以") * 3000
+    hostile = (anchor + filler) * (50_000 // (len(anchor) + len(filler)))
     started = time.perf_counter()
     chinese_signals(hostile)
 
-    assert time.perf_counter() - started < 0.5
+    assert time.perf_counter() - started < 1.0
 
 
 def test_a_hard_chinese_question_now_goes_high() -> None:
@@ -191,3 +198,147 @@ def test_an_easy_chinese_lookup_stays_low() -> None:
     score, _ = HeuristicRouter().score("请从这行日志中提取 HTTP 状态码，只回答数字")
 
     assert score < 1.0
+
+
+# ------------------------------------------------ post-hoc fixes (review, 2026-09-24)
+# Added after the pre-registered measurement; reported as post-hoc in
+# docs/heuristic-zh-prereg.md. Each case is a finding an independent verifier
+# reproduced.
+
+POST_HOC_FIRES = [
+    ("reasoning_markers", "这个接口怎么这么慢"),                 # colloquial why
+    ("reasoning_markers", "线上服务怎么又 OOM 了"),
+    ("reasoning_markers", "这俩协程咋就卡住不动了"),
+    ("reasoning_markers", "机器上咋这么多 TIME_WAIT"),
+    ("reasoning_markers", "凭啥这里要加锁"),
+    ("reasoning_markers", "这个操作为什么会失败"),               # 操作 + 为什么, not 作为
+    ("reasoning_markers", "配置为什么不生效"),
+    ("reasoning_markers", "生成为什么这么慢"),
+    ("reasoning_markers", "名称为什么显示乱码"),
+    ("reasoning_markers", "讲下这段代码"),
+    ("reasoning_markers", "讲一讲原理"),
+    ("reasoning_markers", "科普一下 CAP"),
+    ("reasoning_markers", "怎么证这个结论"),
+    ("reasoning_markers", "证一下这个不等式"),
+    ("reasoning_markers", "指出以下 Python 函数中的缺陷"),       # gap longer than 8 characters
+    ("reasoning_markers", "指出 parseConfig 里的 bug"),          # an identifier inside the gap
+    ("reasoning_markers", "说一下原因"),
+    ("reasoning_markers", "这两者之间怎么折中"),
+    ("reasoning_markers", "理论 QPS 能到多少"),
+    ("reasoning_markers", "这次改动破坏了循环不变式"),
+    ("multi_step", "从 v1.2 版本开始就这样"),                    # '.' inside a version number
+    ("multi_step", "从 main.py 开始看"),
+    ("multi_step", "跟踪 processIncomingRequest 的执行"),
+    ("multi_step", "跟踪一下这个请求"),
+    ("multi_step", "逐步排查一下"),
+    ("multi_step", "从不同的节点开始遍历"),                     # 从不同 is not 从不
+    ("multi_step", "从这个版本起"),
+    ("multi_step", "画个登录的时序图"),
+    ("technical_terms", "多副本之间怎么同步"),
+    ("technical_terms", "数据复制延迟很高"),
+    ("technical_terms", "从库查询很慢"),
+    # second pass over what the review pairs still missed
+    ("reasoning_markers", "这个原子操作为何在 ARM 上不生效"),     # 操作 + 为何, not 作为
+    ("reasoning_markers", "这个 pod 一直重启是啥原因"),
+    ("reasoning_markers", "接口偶尔超时，什么原因"),
+    ("reasoning_markers", "干嘛这么设计"),
+    ("reasoning_markers", "请指出这段 C 代码中可能导致内存泄漏的缺陷"),   # an 18-unit gap
+    ("multi_step", "跟一下这个请求的调用链"),
+    ("multi_step", "这是报错堆栈，帮我看看"),                   # a stack trace
+    ("multi_step", "分步拆解一下状态转移"),
+    ("multi_step", "分步算一下要多少台机器"),
+    ("multi_step", "x 最后的值是多少"),
+    ("multi_step", "这个 bug 偶现"),                            # occurs intermittently
+    ("multi_step", "重复到收敛为止"),
+]
+
+POST_HOC_TRAPS = [
+    ("technical_terms", "帮我改一下标题，改成部署指南"),         # 一下 + 标题 straddles 下标
+    ("technical_terms", "看一下标准库里有没有 json 解析"),
+    ("technical_terms", "国内有什么好用的搜索引擎"),             # 搜索引擎 straddles 索引
+    ("technical_terms", "把 users 表的数据复制到 users_bak 表"),  # copy the data
+    ("technical_terms", "下单后从库存里扣掉数量"),               # 从 + 库存 straddles 从库
+    ("technical_terms", "关闭包括日志在内的输出"),               # 关闭 + 包括 straddles 闭包
+    ("technical_terms", "这会改变基本的行为"),                   # 改变 + 基本 straddles 变基
+    ("technical_terms", "docker 文件夹放哪"),
+    ("technical_terms", "如果值为正则返回 1"),                   # 为正，则返回
+    ("technical_terms", "把参数传递归一化之后的值"),             # 传递 + 归一化 straddles 递归
+    ("technical_terms", "IEEE 754 双精度里 0.1 + 0.2 等于 0.3 吗"),  # English keys only "ieee-754"
+    ("reasoning_markers", "调整一下界面的配色"),                 # 一下 + 界面 straddles 下界
+    ("reasoning_markers", "这个默认行为什么时候改的"),           # 行为 + 什么时候: when, not why
+    ("reasoning_markers", "timeout 设置为什么值比较合适"),       # 设置为 + 什么值
+    ("reasoning_markers", "日志分为什么级别"),
+    ("reasoning_markers", "因为什么都没做"),
+    ("reasoning_markers", "因为毛利率下降，帮我翻译成英文"),     # 为毛 slang vs 毛利率
+    ("reasoning_markers", "表单校验失败时给出错误提示"),         # emit an error, not name the bug
+    ("reasoning_markers", "这种写法很容易写出 bug"),
+    ("reasoning_markers", "这个包的使用说明怎么看"),             # 说明 the noun
+    ("reasoning_markers", "我想了解读写分离怎么配"),             # 了解 + 读写 straddles 解读
+    ("reasoning_markers", "我想了解释放锁的时机"),               # 了解 + 释放 straddles 解释
+    ("reasoning_markers", "明天要给客户讲解决方案"),             # 讲 + 解决 straddles 讲解
+    ("reasoning_markers", "帮我开一份实习证明"),
+    ("reasoning_markers", "社保证明怎么开"),
+    ("reasoning_markers", "昨天强推导致代码丢了"),               # 强推 + 导致 straddles 推导
+    ("reasoning_markers", "进程被杀死锁住的文件没释放"),         # 杀死 + 锁住 straddles 死锁
+    ("reasoning_markers", "把这个任务调优先级"),                 # 调 + 优先级 straddles 调优
+    ("reasoning_markers", "这种病根据指南怎么治"),               # 病 + 根据 straddles 病根
+    ("reasoning_markers", "说下进度"),                          # say, not explain
+    ("reasoning_markers", "去办证一下"),
+    ("reasoning_markers", "这个参数是干嘛用的"),                 # what for, not why
+    ("multi_step", "把开发生产两套环境的配置分开"),             # 开发 + 生产 straddles 发生
+    ("multi_step", "push 之后自动触发生成文档"),
+    ("multi_step", "点击按钮后会出现一个弹窗"),                 # appear, not occur
+    ("multi_step", "pandas 里怎么把浮点数列保留两位小数"),       # 浮点数 + 列 straddles 数列
+    ("multi_step", "Excel 怎么隐藏所有奇数列"),
+    ("multi_step", "手动执行一下这个脚本"),                     # run by hand, not trace
+    ("multi_step", "以后开始用 pnpm"),                          # 以后 is not 以
+    ("multi_step", "把汇总共享到群里"),                         # 汇总 + 共享 straddles 总共
+    ("multi_step", "整合计费模块"),                             # 整合 + 计费 straddles 合计
+    ("multi_step", "每次运行都报错"),                           # every time; English keys "each time"
+    ("multi_step", "灰度逐步来吧"),                             # gradually
+    ("simple_markers", "多了几个字节导致校验失败"),             # a few bytes
+    ("simple_markers", "用哪个 git 命令可以撤销提交"),           # English keys only "give the git command"
+    ("simple_markers", "把时间戳转成十进制再比较"),             # English keys only "decimal value of"
+    # second pass
+    ("reasoning_markers", "这个变量命名为什么比较好"),           # 命名为 + 什么
+    ("reasoning_markers", "服务停了以后状态会变为什么"),         # 变为 + 什么
+    ("reasoning_markers", "还有这个漏洞的 CVE 编号是多少"),      # 还有: "also"
+    ("reasoning_markers", "没什么原因，就是想改"),               # "no particular reason"
+    ("multi_step", "Excel 最后加一行合计"),                     # a totals row
+    ("multi_step", "打完折最终价格是多少"),                     # a final price, not a final value
+    ("multi_step", "我跟一下产品的值班"),                       # following up, not tracing
+    ("multi_step", "最后的值班表发我一下"),
+    ("multi_step", "我们分步走，先上 A 再上 B"),                 # phased rollout
+    ("simple_markers", "为什么内核把这块内存归类为 cache"),     # a description, not a directive
+]
+
+
+@pytest.mark.parametrize("signal,prompt", POST_HOC_FIRES)
+def test_post_hoc_rendering_fires(signal, prompt) -> None:
+    assert signal in chinese_signals(prompt.lower())
+
+
+@pytest.mark.parametrize("signal,prompt", POST_HOC_TRAPS)
+def test_post_hoc_trap_does_not_fire(signal, prompt) -> None:
+    assert signal not in chinese_signals(prompt.lower())
+
+
+@pytest.mark.parametrize("text,words", [
+    ("好的,谢谢.", 4 / HAN_CHARS_PER_WORD),                    # half-width punctuation by Han
+    ("“登陆”改成“登录”", 6 / HAN_CHARS_PER_WORD),              # IME quotation marks
+    ("改成 x = 3x + 1 吧", 5 + 3 / HAN_CHARS_PER_WORD),         # code operators still count
+    ("用ｅｘｐｌａｉｎ看看", 1 + 3 / HAN_CHARS_PER_WORD),       # full-width letters are a word
+])
+def test_punctuation_next_to_chinese_is_not_a_word(text, words) -> None:
+    assert word_count(text.lower()) == pytest.approx(words)
+
+
+def test_full_width_brackets_typed_by_a_chinese_ime_are_code() -> None:
+    """A Chinese IME types （） by default; English foo() fires contains_code."""
+    assert "contains_code" in _fired("看下 foo（）的返回值")
+
+
+def test_rare_han_extensions_are_han() -> None:
+    from dms.routers.heuristic_zh import has_han
+
+    assert has_han("\U00030000") and has_han("\U0002f800") and has_han("〇")

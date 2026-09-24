@@ -18,7 +18,12 @@ from dataclasses import dataclass, field
 
 from dms.client import ModelClient
 from dms.routers.base import TIER_MODELS, Decision, Router
-from dms.routers.heuristic_zh import HAN_CHARS_PER_WORD, chinese_signals, word_count
+from dms.routers.heuristic_zh import (
+    HAN_CHARS_PER_WORD,
+    chinese_signals,
+    code_view,
+    word_count,
+)
 from dms.workload import Task
 
 __all__ = ["HAN_CHARS_PER_WORD", "HeuristicRouter", "Signal", "word_count"]
@@ -88,7 +93,7 @@ class HeuristicRouter(Router):
         signals = (
             Signal("long_prompt", 1.0, words > 35),
             Signal("very_long_prompt", 1.0, words > 70),
-            Signal("contains_code", 1.0, bool(CODE_PATTERN.search(prompt))),
+            Signal("contains_code", 1.0, bool(CODE_PATTERN.search(code_view(prompt)))),
             Signal("reasoning_markers", 1.5,
                    _any_in(text, REASONING_MARKERS) or "reasoning_markers" in zh),
             Signal("multi_step", 1.5,

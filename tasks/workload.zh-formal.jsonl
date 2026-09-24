@@ -1,0 +1,36 @@
+{"id": "e01", "prompt": "请将以下日志行的严重级别归为 DEBUG、INFO、WARN、ERROR 之一。仅回答级别。\n\n2026-08-01T04:12:09Z payment-svc: failed to settle txn 8813: connection refused"}
+{"id": "e02", "prompt": "请从以下访问日志行中提取 HTTP 状态码。仅回答数字。\n\n10.2.0.14 - - [01/Aug/2026:04:12:09] \"POST /v1/settle HTTP/1.1\" 503 219 \"-\" \"curl/8.4\""}
+{"id": "e03", "prompt": "哪种编程语言使用 .rs 文件扩展名？仅回答语言名称，并使用小写。"}
+{"id": "e04", "prompt": "请给出撤销最近一次提交、同时将其更改以已暂存状态保留在工作树中的 git 命令。仅回答命令。"}
+{"id": "e05", "prompt": "请从以下 JSON 中提取 \"retries\" 的值。仅回答该值。\n\n{\"service\": \"queue\", \"config\": {\"timeout_ms\": 300, \"retries\": 42}, \"enabled\": true}"}
+{"id": "e06", "prompt": "正则表达式 ^\\d{3}-\\d{4}$ 是否匹配字符串 555-0123？请回答“是”或“否”。"}
+{"id": "e07", "prompt": "根据 RFC 9110，HTTP PUT 方法是否具有幂等性？请回答“是”或“否”。"}
+{"id": "e08", "prompt": "一梅比字节（mebibyte）等于多少基比字节（kibibyte）？仅回答数字。"}
+{"id": "e09", "prompt": "在 POSIX shell 中，当命令未找到时，shell 返回的退出码是多少？仅回答数字。"}
+{"id": "e10", "prompt": "以下哪一项是有效的语义化版本字符串：1.0.0-alpha.1, v1.0, 1.0.0.0？仅回答有效的那一项。"}
+{"id": "e11", "prompt": "十六进制字面量 0xFF 的十进制值是多少？仅回答数字。"}
+{"id": "e12", "prompt": "一个单层循环对包含 n 个元素的列表遍历一次，每次迭代执行常数量的工作，其时间复杂度是多少？仅以大 O 表示法作答。"}
+{"id": "m01", "prompt": "按照 Conventional Commits 规范，以下更改应使用哪种类型前缀：'correct off-by-one in pagination offset so the last page renders'？仅回答类型，不要包含冒号。"}
+{"id": "m02", "prompt": "给定表 orders(id, customer_id, total_cents, created_at)，请编写一条 SQL 查询，返回每个 customer_id 及其订单数量。仅回答 SQL。"}
+{"id": "m03", "prompt": "某 Python 服务抛出 KeyError: 'user_id'，出错代码行为 `uid = payload['user_id']`。根本原因是什么？请用不超过五个词回答。"}
+{"id": "m04", "prompt": "请用不超过五个词指出以下 Python 函数中的缺陷。\n\ndef add(item, bucket=[]):\n    bucket.append(item)\n    return bucket"}
+{"id": "m05", "prompt": "客户端对某资源执行 PUT 请求，但该资源的版本与服务器上的当前版本不一致，服务器因此拒绝了该请求。正确的 HTTP 状态码是什么？仅回答数字。"}
+{"id": "m06", "prompt": "请写出表示“每周一 03:00”的 cron 表达式。仅回答五字段表达式。"}
+{"id": "m07", "prompt": "在某个 Dockerfile 中，`COPY . /app` 位于 `RUN pip install -r requirements.txt` 之前。为什么这会导致重新构建缓慢？请用少于十个词回答。"}
+{"id": "m08", "prompt": "两个 goroutine 在未使用互斥锁或原子操作的情况下对同一个 int 变量执行自增。这是否构成数据竞争？请回答“是”或“否”。"}
+{"id": "m09", "prompt": "以下 Python 表达式的求值结果是什么？仅回答数字。\n\nlen([x for x in range(10) if x % 3 != 0])"}
+{"id": "m10", "prompt": "查询 `SELECT * FROM events WHERE created_at > $1 ORDER BY created_at LIMIT 100` 在一张 50M 行的表上执行了全表扫描。需要为哪一个列建立索引？仅回答列名。"}
+{"id": "m11", "prompt": "以下描述的是哪种设计模式：一个类只允许存在一个实例，并提供访问该实例的全局访问点？仅回答模式名称。"}
+{"id": "m12", "prompt": "在 Python 中，`len({1, 2, 2, 3, 3, 3})` 的值是多少？仅回答数字。"}
+{"id": "h01", "prompt": "初始时 x = 1。将以下操作重复 4 次：若 x 为奇数，则令 x = 3x + 1；否则令 x = x / 2。x 的最终值是多少？仅回答数字。"}
+{"id": "h02", "prompt": "对 n 个元素执行两层嵌套循环，但内层循环每次都在第一次迭代时执行 `break`。其紧确时间复杂度是多少？仅以大 O 表示法作答。"}
+{"id": "h03", "prompt": "线程 A 先锁定互斥锁 X，再锁定互斥锁 Y。线程 B 先锁定互斥锁 Y，再锁定互斥锁 X。两个线程并发运行，且均未设置超时。是否可能发生死锁？请回答“是”或“否”。"}
+{"id": "h04", "prompt": "在 Python 中，先执行 `fns = [lambda: i for i in range(3)]`，再执行 `[f() for f in fns]`，结果返回 [2, 2, 2] 而非 [0, 1, 2]。请用不超过五个词指出原因。"}
+{"id": "h05", "prompt": "用户更新了个人资料，随后被路由到一个尚未同步到最新数据的副本，看到的仍是旧值。这违反了哪种一致性保证？仅回答该保证的名称。"}
+{"id": "h06", "prompt": "在 IEEE-754 双精度浮点数中，0.1 + 0.2 == 0.3 的求值结果是否为 true？请回答“是”或“否”。"}
+{"id": "h07", "prompt": "对包含 1,000,000 个元素的有序数组进行二分查找，在最坏情况下最多执行多少次比较？仅回答数字。"}
+{"id": "h08", "prompt": "某递归函数 f(n) 在 n <= 1 时返回 1，否则返回 n * f(n - 1)。f(5) 的值是多少？仅回答数字。"}
+{"id": "h09", "prompt": "对一个不属于任何分支的提交执行 `git checkout <sha>`。此时 HEAD 处于什么状态？请用不超过两个词回答。"}
+{"id": "h10", "prompt": "某数组每一步减半，直到只剩一个元素。从 256 个元素开始，共发生多少次减半操作？仅回答数字。"}
+{"id": "h11", "prompt": "任何基于比较的排序算法，其最坏情况运行时间的紧确下界是什么？仅以大 O 表示法作答。"}
+{"id": "h12", "prompt": "某缓存可容纳 3 个条目，采用 LRU 淘汰策略。访问序列为：A B C A D B。总共发生多少次缓存未命中？仅回答数字。"}

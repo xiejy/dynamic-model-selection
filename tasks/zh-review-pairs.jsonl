@@ -1,0 +1,250 @@
+{"id": "fp-hunter:p01", "zh": "帮我改一下标题，改成「部署指南」", "en": "Change the title to 'Deployment Guide'"}
+{"id": "fp-hunter:p02", "zh": "README 的标题太长了，帮我改短一点", "en": "The README title is too long, make it shorter"}
+{"id": "fp-hunter:p03", "zh": "调整一下界面的配色，暗色模式下字看不清", "en": "Tweak the UI colors, the text is unreadable in dark mode"}
+{"id": "fp-hunter:p04", "zh": "帮我检查一下标点符号，中英文标点混用了", "en": "Check the punctuation, Chinese and English punctuation are mixed"}
+{"id": "fp-hunter:p05", "zh": "看一下标准库里有没有现成的 json 解析", "en": "Check whether the standard library already has a JSON parser"}
+{"id": "fp-hunter:p06", "zh": "把 docs 目录下标题都改成英文", "en": "Change all the headings under the docs directory to English"}
+{"id": "fp-hunter:p07", "zh": "以下标题帮我翻译成英文：快速开始、常见问题", "en": "Translate the following headings into English: Quick Start, FAQ"}
+{"id": "fp-hunter:p08", "zh": "登录页面改一下界面文案，把“登陆”改成“登录”", "en": "On the login page, fix the UI copy: change 登陆 to 登录"}
+{"id": "fp-hunter:p09", "zh": "这个参数默认为什么？", "en": "What's the default for this parameter?"}
+{"id": "fp-hunter:p10", "zh": "这个变量命名为什么比较好？", "en": "What would be a good name for this variable?"}
+{"id": "fp-hunter:p11", "zh": "timeout 设置为什么值比较合适", "en": "What's a sensible value to set the timeout to?"}
+{"id": "fp-hunter:p12", "zh": "“落地”这个词翻译为什么英文比较地道", "en": "What's the most natural English translation of '落地'?"}
+{"id": "fp-hunter:p13", "zh": "服务停了以后状态会变为什么", "en": "What does the status change to after the service stops?"}
+{"id": "fp-hunter:p14", "zh": "因为毛利率下降，公司决定裁员。帮我翻译成英文", "en": "'Because gross margin fell, the company decided to cut staff.' Translate into English"}
+{"id": "fp-hunter:p15", "zh": "国内有什么好用的搜索引擎？", "en": "What are some good search engines in China?"}
+{"id": "fp-hunter:p16", "zh": "网站怎么提交给搜索引擎收录", "en": "How do I submit my site to search engines?"}
+{"id": "fp-hunter:p17", "zh": "pandas 里怎么把浮点数列保留两位小数", "en": "In pandas, how do I round a float column to two decimal places?"}
+{"id": "fp-hunter:p18", "zh": "Excel 怎么隐藏所有奇数列", "en": "How do I hide all odd-numbered columns in Excel?"}
+{"id": "fp-hunter:p19", "zh": "帮我把 users 表的数据复制到 users_bak 表", "en": "Copy the data from the users table into users_bak"}
+{"id": "fp-hunter:p20", "zh": "下单后从库存里扣掉对应数量，SQL 帮我写一下", "en": "Write the SQL that deducts the quantity from inventory after an order"}
+{"id": "fp-hunter:p21", "zh": "Excel 最后加一行合计", "en": "Add a totals row at the bottom in Excel"}
+{"id": "fp-hunter:p22", "zh": "把这几个数加起来：12、35、8", "en": "Add these numbers up: 12, 35, 8"}
+{"id": "fp-hunter:p23", "zh": "帮我汇总共享文档里的数据", "en": "Summarize the data in the shared doc"}
+{"id": "fp-hunter:p24", "zh": "我们在整合计费模块，帮我起个分支名", "en": "We're integrating the billing module, suggest a branch name"}
+{"id": "fp-hunter:p25", "zh": "npm 怎么关闭包更新提示", "en": "How do I turn off npm's package update notices?"}
+{"id": "fp-hunter:p26", "zh": "把 docker 文件夹删掉", "en": "Delete the docker folder"}
+{"id": "fp-hunter:p27", "zh": "每天早上 9 点跑一次备份，定时任务怎么配", "en": "Run a backup at 9 every morning -- how do I set up the scheduled task?"}
+{"id": "fp-hunter:p28", "zh": "这个脚本怎么手动执行", "en": "How do I run this script manually?"}
+{"id": "fp-hunter:p29", "zh": "把开发生产两套环境的配置文件分开", "en": "Split the config files for the dev and prod environments"}
+{"id": "fp-hunter:p30", "zh": "push 之后自动触发生成文档，这个 GitHub Action 怎么写", "en": "How do I write a GitHub Action that auto-triggers doc generation after a push?"}
+{"id": "fp-hunter:p31", "zh": "查一下这个任务的状态以及开始时间", "en": "Look up this task's status and start time"}
+{"id": "fp-hunter:p32", "zh": "我刚才强推导致远程分支被覆盖了，怎么找回", "en": "I just force-pushed and overwrote the remote branch, how do I get it back?"}
+{"id": "fp-hunter:p33", "zh": "文件被占用删不掉，怎么杀死锁住它的进程", "en": "The file is in use and can't be deleted -- how do I kill the process that's locking it?"}
+{"id": "fp-hunter:p34", "zh": "表单校验失败时给出错误提示", "en": "Show an error message when form validation fails"}
+{"id": "fp-hunter:p35", "zh": "接口参数不对的时候给出错误码 400", "en": "Return error code 400 when the API parameters are invalid"}
+{"id": "fp-hunter:p36", "zh": "Jira 里怎么调优先级", "en": "How do I change an issue's priority in Jira?"}
+{"id": "fp-hunter:p37", "zh": "帮我跟踪下这个报销流程", "en": "Help me follow up on this reimbursement process"}
+{"id": "fp-hunter:p38", "zh": "磁盘读写出现错误怎么办", "en": "What should I do about disk read/write errors?"}
+{"id": "fp-hunter:p39", "zh": "改变基本布局，把侧边栏挪到右边", "en": "Change the basic layout: move the sidebar to the right"}
+{"id": "fp-hunter:p40", "zh": "写个函数，数为正则返回 1，为负则返回 -1，否则返回 0", "en": "Write a function that returns 1 if the number is positive, -1 if negative, 0 otherwise"}
+{"id": "fp-hunter:p41", "zh": "把传递归一化后的张量给下一层", "en": "Pass the normalized tensor on to the next layer"}
+{"id": "fp-hunter:p42", "zh": "README 里有说明如何安装吗", "en": "Does the README say how to install it?"}
+{"id": "fp-hunter:p43", "zh": "这个包的使用说明怎么看", "en": "Where do I find this package's usage docs?"}
+{"id": "fp-hunter:p44", "zh": "我想了解读写分离怎么配", "en": "I'd like to know how to configure read/write splitting"}
+{"id": "fp-hunter:p45", "zh": "Spring 自定义注解读取不到值", "en": "In Spring, my custom annotation's value can't be read"}
+{"id": "fp-hunter:p46", "zh": "我先讲一下需求：导出一个 csv，列名用中文", "en": "Here's what I need: export a CSV with Chinese column names"}
+{"id": "fp-hunter:p47", "zh": "nginx 里无论证书放哪个目录都可以吗", "en": "In nginx, can the certificate go in any directory?"}
+{"id": "fp-hunter:p48", "zh": "帮我把实习证明翻译成英文", "en": "Translate my internship certificate into English"}
+{"id": "fp-hunter:p49", "zh": "社保证明怎么开", "en": "How do I get a social insurance certificate?"}
+{"id": "fp-hunter:p50", "zh": "还有这个漏洞的 CVE 编号是多少", "en": "Also, what's the CVE ID for this vulnerability?"}
+{"id": "fp-hunter:p51", "zh": "我们有个漏洞报告要翻译成英文，先帮我翻第一段", "en": "We have a vulnerability report to translate into English; start with the first paragraph"}
+{"id": "fp-hunter:p52", "zh": "改完保证单测能跑过就行", "en": "After the change, just make sure the unit tests pass"}
+{"id": "fp-hunter:p53", "zh": "帮我优化一下这段文案，读起来太生硬了", "en": "Polish this copy for me, it reads too stiffly"}
+{"id": "fp-hunter:p54", "zh": "点击按钮后会出现一个弹窗，弹窗宽度怎么设", "en": "A popup appears after clicking the button; how do I set its width?"}
+{"id": "fp-hunter:p55", "zh": "我从公司电脑连服务器刚开始正常，后来断了", "en": "Connecting to the server from my work PC was fine at first, then it dropped"}
+{"id": "fp-hunter:p56", "zh": "唐朝从哪一年开始的", "en": "When did the Tang dynasty begin?"}
+{"id": "fp-hunter:p57", "zh": "明朝灭亡发生在哪一年", "en": "In what year did the Ming dynasty fall?"}
+{"id": "fp-hunter:p58", "zh": "打完折最终价格是多少", "en": "What's the final price after the discount?"}
+{"id": "fp-hunter:p59", "zh": "把部署流程从头到尾走一遍", "en": "Run through the deployment process from start to finish"}
+{"id": "fp-hunter:p60", "zh": "每次 git pull 都要输密码，怎么免密", "en": "Every time I git pull it asks for my password, how do I stop that?"}
+{"id": "fp-hunter:p61", "zh": "这个突变基因会遗传吗", "en": "Is this mutated gene hereditary?"}
+{"id": "fp-hunter:c01", "zh": "ls -la 是什么意思", "en": "What does ls -la mean?"}
+{"id": "fp-hunter:c02", "zh": "帮我把这个文件重命名成 utils.py", "en": "Rename this file to utils.py"}
+{"id": "fp-hunter:c03", "zh": "把这段 JSON 格式化一下", "en": "Format this JSON"}
+{"id": "fp-hunter:c04", "zh": "怎么查看 node 版本", "en": "How do I check the node version?"}
+{"id": "fp-hunter:c05", "zh": "git 怎么撤销上一次 commit", "en": "How do I undo the last commit in git?"}
+{"id": "fp-hunter:c06", "zh": "帮我翻译成英文：明天的会议改到下午三点", "en": "Translate to English: tomorrow's meeting is moved to 3pm"}
+{"id": "fp-hunter:c07", "zh": "秦始皇是哪一年统一六国的", "en": "In what year did Qin Shi Huang unify the six states?"}
+{"id": "fp-hunter:c08", "zh": "光速是多少", "en": "What's the speed of light?"}
+{"id": "fp-hunter:c09", "zh": "ModuleNotFoundError: No module named 'requests' 咋整", "en": "ModuleNotFoundError: No module named 'requests' -- how do I fix it?"}
+{"id": "fp-hunter:c10", "zh": "这个报错啥意思\n\nError: listen EADDRINUSE: address already in use :::3000", "en": "What does this error mean?\n\nError: listen EADDRINUSE: address already in use :::3000"}
+{"id": "fp-hunter:c11", "zh": "跑 pytest 报这个，咋回事\nE   AssertionError: assert 3 == 4", "en": "pytest gives me this, what's going on?\nE   AssertionError: assert 3 == 4"}
+{"id": "fp-hunter:c12", "zh": "src/components/Header.tsx 里的 logo 换成 /assets/logo.svg", "en": "In src/components/Header.tsx, swap the logo for /assets/logo.svg"}
+{"id": "fp-hunter:c13", "zh": "给这个函数加一下类型注解", "en": "Add type annotations to this function"}
+{"id": "fp-hunter:c14", "zh": "卸载一下这个包", "en": "Uninstall this package"}
+{"id": "fp-hunter:c15", "zh": "在页面底部加一行版权声明", "en": "Add a copyright line at the bottom of the page"}
+{"id": "fp-hunter:c16", "zh": "端口 8080 被占用了，换成 8081", "en": "Port 8080 is taken, switch to 8081"}
+{"id": "fp-hunter:c17", "zh": "帮我写个 commit message，改动是修了登录页的样式", "en": "Write me a commit message; the change fixes the login page styles"}
+{"id": "fp-hunter:c18", "zh": "牛顿第二定律是啥", "en": "What is Newton's second law?"}
+{"id": "fp-hunter:c19", "zh": "今天周几", "en": "What day of the week is it today?"}
+{"id": "fp-hunter:c20", "zh": "谢谢，没问题了", "en": "Thanks, all good now"}
+{"id": "fp-hunter:t01", "zh": "幫我改一下標題", "en": "Change the title for me"}
+{"id": "fp-hunter:t02", "zh": "調整一下界面字體大小", "en": "Adjust the UI font size"}
+{"id": "fp-hunter:t03", "zh": "這個參數預設為什麼", "en": "What's this parameter's default?"}
+{"id": "fp-hunter:t04", "zh": "Excel 怎麼隱藏所有奇數列", "en": "How do I hide all odd-numbered columns in Excel?"}
+{"id": "fp-hunter:t05", "zh": "幫我把資料複製到另一張表", "en": "Copy the data into another table"}
+{"id": "fp-hunter:t06", "zh": "點擊按鈕後會出現一個彈窗", "en": "A popup appears after you click the button"}
+{"id": "fp-hunter:t07", "zh": "這個腳本怎麼手動執行", "en": "How do I run this script manually?"}
+{"id": "fp-hunter:t08", "zh": "國內有什麼好用的搜索引擎", "en": "What are some good search engines in China?"}
+{"id": "fp-hunter:n01", "zh": "帮我把这个函数名改成 getUserInfo", "en": "Rename this function to getUserInfo"}
+{"id": "fp-hunter:n02", "zh": "这个 import 没用到，删了吧", "en": "This import is unused, delete it"}
+{"id": "fp-hunter:n03", "zh": "把 tab 换成四个空格", "en": "Replace tabs with four spaces"}
+{"id": "fp-hunter:n04", "zh": "pip 装包太慢了，怎么换清华源", "en": "pip installs are too slow, how do I switch to the Tsinghua mirror?"}
+{"id": "fp-hunter:n05", "zh": "docker ps 看不到容器，但是 docker ps -a 能看到，啥情况", "en": "docker ps shows no containers but docker ps -a does, what's up?"}
+{"id": "fp-hunter:n06", "zh": "帮我写个 .gitignore，忽略 node_modules 和 .env", "en": "Write a .gitignore that ignores node_modules and .env"}
+{"id": "fp-hunter:n07", "zh": "这个 PR 的描述帮我润色一下", "en": "Polish this PR description for me"}
+{"id": "fp-hunter:n08", "zh": "把这段注释翻译成英文", "en": "Translate this comment into English"}
+{"id": "fp-hunter:n09", "zh": "vim 里怎么全局替换", "en": "How do I do a global replace in vim?"}
+{"id": "fp-hunter:n10", "zh": "mac 上怎么看哪个进程占了 3000 端口", "en": "On a Mac, how do I see which process is using port 3000?"}
+{"id": "fp-hunter:n11", "zh": "帮我生成一个 uuid", "en": "Generate a UUID for me"}
+{"id": "fp-hunter:n12", "zh": "把日期格式改成 yyyy-MM-dd", "en": "Change the date format to yyyy-MM-dd"}
+{"id": "fp-hunter:n13", "zh": "这个按钮往右挪一点，和输入框对齐", "en": "Move this button a bit to the right so it lines up with the input"}
+{"id": "fp-hunter:n14", "zh": "加个 loading 状态，请求的时候按钮置灰", "en": "Add a loading state: grey out the button while the request is in flight"}
+{"id": "fp-hunter:n15", "zh": "把 console.log 都删掉", "en": "Delete all the console.log calls"}
+{"id": "fp-hunter:n16", "zh": "git stash 之后怎么恢复", "en": "How do I get my changes back after git stash?"}
+{"id": "fp-hunter:n17", "zh": "这个 warning 能忽略吗\nDeprecationWarning: datetime.utcnow() is deprecated", "en": "Can I ignore this warning?\nDeprecationWarning: datetime.utcnow() is deprecated"}
+{"id": "fp-hunter:n18", "zh": "帮我把这个接口的超时改成 30 秒", "en": "Change this endpoint's timeout to 30 seconds"}
+{"id": "fp-hunter:n19", "zh": "yarn 和 npm 有啥区别", "en": "What's the difference between yarn and npm?"}
+{"id": "fp-hunter:n20", "zh": "这个 CSS 在 Safari 上显示不对，字体发虚", "en": "This CSS renders wrong in Safari, the font looks blurry"}
+{"id": "fp-hunter:n21", "zh": "给这个表加个 created_at 字段", "en": "Add a created_at column to this table"}
+{"id": "fp-hunter:n22", "zh": "帮我看下这个 SQL 有没有语法错误", "en": "Check whether this SQL has any syntax errors"}
+{"id": "fp-hunter:n23", "zh": "k8s 里怎么看 pod 的日志", "en": "How do I see a pod's logs in k8s?"}
+{"id": "fp-hunter:n24", "zh": "把这个 README 里的错别字改一下", "en": "Fix the typos in this README"}
+{"id": "fp-hunter:n25", "zh": "环境变量在哪里配", "en": "Where do I set the environment variables?"}
+{"id": "fp-hunter:n26", "zh": "npm run build 报错了\nError: Cannot find module 'vite'", "en": "npm run build fails\nError: Cannot find module 'vite'"}
+{"id": "fp-hunter:n27", "zh": "帮我把这几个文件移到 utils 目录下", "en": "Move these files into the utils directory"}
+{"id": "fp-hunter:n28", "zh": "这个变量改成常量", "en": "Make this variable a constant"}
+{"id": "fp-hunter:n29", "zh": "拉一下最新代码，然后跑一下测试", "en": "Pull the latest code, then run the tests"}
+{"id": "fp-hunter:n30", "zh": "帮我起个好听的项目名，跟天气有关", "en": "Suggest a nice project name, something about weather"}
+{"id": "fp-hunter:n31", "zh": "今天北京天气怎么样", "en": "What's the weather like in Beijing today?"}
+{"id": "fp-hunter:n32", "zh": "抗日战争是哪年结束的", "en": "What year did the War of Resistance against Japan end?"}
+{"id": "fp-hunter:n33", "zh": "水的沸点是多少度", "en": "What's the boiling point of water?"}
+{"id": "fp-hunter:n34", "zh": "帮我写一段请假邮件，下周一请一天假", "en": "Write a leave-request email: I'm taking next Monday off"}
+{"id": "fp-hunter:n35", "zh": "把这个 JSON 转成 YAML", "en": "Convert this JSON to YAML"}
+{"id": "fp-hunter:n36", "zh": "这个正则帮我改成也能匹配大写", "en": "Change this regex so it also matches uppercase"}
+{"id": "fp-hunter:n37", "zh": "commit 信息写错了，怎么改", "en": "I got the commit message wrong, how do I change it?"}
+{"id": "fp-hunter:n38", "zh": "把 master 分支合到我这个分支上", "en": "Merge master into my branch"}
+{"id": "fp-hunter:n39", "zh": "curl 怎么带 header 发 POST 请求", "en": "How do I send a POST request with a header using curl?"}
+{"id": "fp-hunter:n40", "zh": "这个页面加个返回顶部按钮", "en": "Add a back-to-top button to this page"}
+{"id": "fp-hunter:n41", "zh": "帮我看看这段日志是什么意思，有没有问题\n2026-09-20 10:01:22 WARN  [pool-3] HikariPool-1 - Connection is not available, request timed out after 30000ms", "en": "Can you check what this log means and whether anything's wrong?\n2026-09-20 10:01:22 WARN  [pool-3] HikariPool-1 - Connection is not available, request timed out after 30000ms"}
+{"id": "fp-hunter:n42", "zh": "好的，就按你说的改", "en": "OK, change it the way you said"}
+{"id": "fp-hunter:n43", "zh": "再跑一次看看", "en": "Run it again and see"}
+{"id": "fp-hunter:n44", "zh": "这次对了，谢谢", "en": "That's right this time, thanks"}
+{"id": "fp-hunter:n45", "zh": "把测试覆盖率报告生成到 coverage 目录", "en": "Generate the test coverage report into the coverage directory"}
+{"id": "fn-hunter:why:怎么这么", "zh": "这个接口怎么这么慢，p99 都到 2s 了", "en": "why is this endpoint so slow? p99 is already at 2s"}
+{"id": "fn-hunter:why:怎么又", "zh": "线上服务怎么又 OOM 了，昨天刚扩的内存", "en": "why is the prod service OOMing again? we just added memory yesterday"}
+{"id": "fn-hunter:why:咋就", "zh": "这俩协程咋就卡住不动了", "en": "why are these two coroutines stuck"}
+{"id": "fn-hunter:why:咋这么", "zh": "机器上咋这么多 TIME_WAIT", "en": "why are there so many TIME_WAIT connections on this box"}
+{"id": "fn-hunter:why:怎么突然", "zh": "怎么突然就连不上 redis 了，配置没动过", "en": "why can't I connect to redis all of a sudden? nothing in the config changed"}
+{"id": "fn-hunter:why:怎么一直", "zh": "内存怎么一直涨，没看到有泄漏的地方啊", "en": "why does memory keep growing? I don't see anything leaking"}
+{"id": "fn-hunter:why:怎么就", "zh": "同样的代码，本地怎么就没问题", "en": "same code, so why does it work fine locally"}
+{"id": "fn-hunter:why:啥原因", "zh": "这个 pod 一直重启是啥原因", "en": "why does this pod keep restarting"}
+{"id": "fn-hunter:why:什么原因", "zh": "接口偶尔超时，什么原因", "en": "the endpoint times out every now and then, why"}
+{"id": "fn-hunter:why:干嘛这么", "zh": "干嘛这么设计，直接用一个队列不行吗", "en": "why is it designed like this? couldn't you just use a single queue"}
+{"id": "fn-hunter:why:干嘛用", "zh": "这里干嘛用 volatile，synchronized 不够吗", "en": "why use volatile here, isn't synchronized enough"}
+{"id": "fn-hunter:why-guard:操作为什么", "zh": "这个 CAS 操作为什么老失败", "en": "why does this CAS operation keep failing"}
+{"id": "fn-hunter:why-guard:操作为什么", "zh": "写操作为什么会把读也阻塞住", "en": "why do write operations block reads too"}
+{"id": "fn-hunter:why-guard:默认为什么", "zh": "这个开关默认为什么不打开", "en": "why isn't this switch turned on by default"}
+{"id": "fn-hunter:why-guard:名称为什么", "zh": "字段名称为什么在反序列化之后变了", "en": "why does the field name change after deserialization"}
+{"id": "fn-hunter:why-guard:生成为什么", "zh": "代码生成为什么这么慢，protoc 跑了五分钟", "en": "why is code generation so slow? protoc ran for five minutes"}
+{"id": "fn-hunter:why-guard:完成为什么", "zh": "构建完成为什么没触发部署", "en": "why didn't the deploy trigger after the build finished"}
+{"id": "fn-hunter:why-guard:确认为什么", "zh": "先帮我确认为什么这个 pod 起不来", "en": "first help me figure out why this pod won't start"}
+{"id": "fn-hunter:why-guard:操作为何", "zh": "这个原子操作为何在 ARM 上不生效", "en": "why does this atomic operation not take effect on ARM"}
+{"id": "fn-hunter:explain:讲下", "zh": "讲下 raft 的选主流程", "en": "explain raft's leader election process"}
+{"id": "fn-hunter:explain:讲一讲", "zh": "讲一讲 MVCC 在 RR 隔离级别下是怎么判断可见性的", "en": "explain how MVCC determines visibility under the RR isolation level"}
+{"id": "fn-hunter:explain:说说", "zh": "说说 epoll 的边缘触发和水平触发有啥区别，各自啥时候用", "en": "explain the difference between edge-triggered and level-triggered epoll, and when to use each"}
+{"id": "fn-hunter:explain:说一下", "zh": "说一下 G1 的 mixed gc 是怎么挑 region 的", "en": "explain how G1's mixed GC picks regions"}
+{"id": "fn-hunter:explain:科普一下", "zh": "科普一下 CRDT 是怎么做到无冲突合并的", "en": "explain how CRDTs achieve conflict-free merging"}
+{"id": "fn-hunter:explain:说下", "zh": "说下 TCP 里快重传和快恢复是怎么配合的", "en": "explain how fast retransmit and fast recovery work together in TCP"}
+{"id": "fn-hunter:explain:展开说说", "zh": "展开说说 Kafka 是怎么做到 exactly once 的", "en": "explain in detail how Kafka achieves exactly once"}
+{"id": "fn-hunter:prove:怎么证", "zh": "这个贪心的正确性怎么证", "en": "how do you prove this greedy algorithm is correct"}
+{"id": "fn-hunter:prove:证一下", "zh": "这个摊还分析的结论能证一下吗", "en": "can you prove the result of this amortized analysis"}
+{"id": "fn-hunter:derive:推一下", "zh": "推一下跳表查找的期望步数", "en": "derive the expected number of steps in a skip list search"}
+{"id": "fn-hunter:derive:手推", "zh": "手推一下 softmax 交叉熵对 logits 的梯度", "en": "derive by hand the gradient of softmax cross-entropy with respect to the logits"}
+{"id": "fn-hunter:tradeoff:折中", "zh": "一致性和可用性这块怎么折中比较好", "en": "what's the right trade-off between consistency and availability here"}
+{"id": "fn-hunter:tradeoff:折衷", "zh": "批大小和延迟之间怎么折衷", "en": "how do I make the trade-off between batch size and latency"}
+{"id": "fn-hunter:theoretical:理论 QPS", "zh": "这台机器的理论 QPS 能到多少", "en": "what's the theoretical QPS of this machine"}
+{"id": "fn-hunter:theoretical+lb:理论下限", "zh": "基于比较的排序理论下限是多少", "en": "what's the theoretical lower bound for comparison-based sorting"}
+{"id": "fn-hunter:theoretical:理论带宽", "zh": "万兆网卡的理论带宽现在跑满了吗", "en": "are we saturating the theoretical bandwidth of the 10GbE NIC"}
+{"id": "fn-hunter:theoretical:理论 IOPS", "zh": "按这块盘的理论 IOPS 算，这个写入量扛得住吗", "en": "going by this disk's theoretical IOPS, can it handle this write volume"}
+{"id": "fn-hunter:worst-case:最坏", "zh": "这个哈希表最坏查找要多久", "en": "what's the worst-case lookup time for this hash table"}
+{"id": "fn-hunter:worst-case:最坏耗时", "zh": "这个接口最坏耗时大概多少", "en": "roughly what's the worst-case latency of this endpoint"}
+{"id": "fn-hunter:violated:破坏了X", "zh": "哪一步破坏了循环不变式", "en": "which step violated the loop invariant"}
+{"id": "fn-hunter:violated:把X给破坏了", "zh": "哪个操作把隔离性给破坏了", "en": "which operation violated isolation"}
+{"id": "fn-hunter:vulnerable:会不会被注入", "zh": "这段拼接 SQL 的代码会不会被注入", "en": "is this string-concatenated SQL code vulnerable to injection"}
+{"id": "fn-hunter:deadlock:锁死", "zh": "两个事务互相等对方的行锁，锁死了", "en": "two transactions are each waiting on the other's row lock and deadlocked"}
+{"id": "fn-hunter:deadlock:锁死", "zh": "这两个协程锁死了，怎么排查", "en": "these two coroutines deadlocked, how do I debug it"}
+{"id": "fn-hunter:step:分步", "zh": "分步拆解一下这个 dp 的状态转移", "en": "break down this DP's state transitions step by step"}
+{"id": "fn-hunter:step:逐步排查", "zh": "帮我逐步排查这个内存泄漏", "en": "help me track down this memory leak step by step"}
+{"id": "fn-hunter:step:逐步调试", "zh": "逐步调试一下这个状态机，看卡在哪个状态", "en": "debug this state machine step by step and see which state it gets stuck in"}
+{"id": "fn-hunter:step:分步算", "zh": "分步算一下这次压测要多少台机器", "en": "work out step by step how many machines this load test needs"}
+{"id": "fn-hunter:step:一步步来", "zh": "一步步来，先看 GC 日志", "en": "step by step, look at the GC log first"}
+{"id": "fn-hunter:sequence:时序图", "zh": "画一下 OAuth2 授权码模式的时序图", "en": "draw a sequence diagram for the OAuth2 authorization code flow"}
+{"id": "fn-hunter:sequence:时序", "zh": "把下单到支付回调这段时序捋一下", "en": "walk through the sequence from placing the order to the payment callback"}
+{"id": "fn-hunter:each-time:每V一次", "zh": "每调用一次这个函数内存就涨一点，是哪没释放", "en": "each time this function is called memory grows a bit, what isn't being freed"}
+{"id": "fn-hunter:each-time:每V一次", "zh": "每来一个请求就新建一个连接，连接池没生效？", "en": "a new connection gets created each time a request comes in, is the pool not working?"}
+{"id": "fn-hunter:start:从X起", "zh": "从空树起，依次插入 5 3 8 1，最后树长啥样", "en": "starting from an empty tree, insert 5 3 8 1 in order; what does the tree look like at the end"}
+{"id": "fn-hunter:start:从不同", "zh": "从不同的节点开始遍历，结果会不一样吗", "en": "starting from different nodes, does the traversal give different results"}
+{"id": "fn-hunter:total:加一起", "zh": "这几个服务加一起要多少内存", "en": "how much memory do these services need in total"}
+{"id": "fn-hunter:total:加一块", "zh": "三个分片加一块能扛多少写入", "en": "how much write throughput can the three shards handle in total"}
+{"id": "fn-hunter:final:最后的值", "zh": "这段循环跑完 x 最后的值是多少", "en": "what's the final value of x after this loop runs"}
+{"id": "fn-hunter:final:最后是多少", "zh": "两个线程各自加一万次，count 最后是多少", "en": "two threads each increment ten thousand times, what's the final value of count"}
+{"id": "fn-hunter:trace:跟一下", "zh": "跟一下这个请求从网关到 DB 的调用链", "en": "trace this request's call chain from the gateway to the DB"}
+{"id": "fn-hunter:trace:追一下", "zh": "追一下这个值是在哪被改掉的", "en": "trace where this value gets overwritten"}
+{"id": "fn-hunter:trace:过一遍", "zh": "把这段状态机代码在脑子里过一遍，看哪个分支会漏", "en": "trace through this state machine code in your head and see which branch gets missed"}
+{"id": "fn-hunter:trace:跟踪这个请求", "zh": "跟踪一下这个请求在各个服务之间是怎么流转的", "en": "trace how this request flows between the services"}
+{"id": "fn-hunter:trace:报错堆栈", "zh": "这是报错堆栈，帮我看看是哪里空指针", "en": "here's the stack trace, help me see where the null pointer is"}
+{"id": "fn-hunter:trace:调用栈", "zh": "看下这个调用栈，协程泄漏是从哪来的", "en": "look at this stack trace, where is the coroutine leak coming from"}
+{"id": "fn-hunter:occur:偶现", "zh": "这个 bug 偶现，本地复现不了", "en": "this bug only occurs intermittently and I can't reproduce it locally"}
+{"id": "fn-hunter:repeat:重复到", "zh": "重复到收敛为止，一般要迭代几轮", "en": "repeat until it converges; how many rounds does that usually take"}
+{"id": "fn-hunter:replica:多副本", "zh": "多副本之间数据不一致怎么排查", "en": "how do I debug data inconsistency between replicas"}
+{"id": "fn-hunter:replica:三副本", "zh": "三副本写入，挂一台会丢数据吗", "en": "with writes going to three replicas, will losing one machine lose data"}
+{"id": "fn-hunter:backtracking:回溯的时候", "zh": "这题回溯的时候状态要怎么恢复", "en": "when backtracking on this problem, how should I restore the state"}
+{"id": "fn-hunter:backtracking:回溯+剪枝", "zh": "回溯加剪枝还是超时，还能怎么搞", "en": "backtracking with pruning still times out, what else can I do"}
+{"id": "fn-hunter:mutex:锁", "zh": "这个锁的粒度是不是太粗了", "en": "is the granularity of this mutex too coarse"}
+{"id": "fn-hunter:index:联合索引 control", "zh": "这个联合索引为啥没走", "en": "why isn't this composite index being used"}
+{"id": "fn-hunter:simple-overreach:几个字节", "zh": "为什么内存对齐后结构体多了几个字节", "en": "why does the struct gain a few bytes after memory alignment"}
+{"id": "fn-hunter:simple-overreach:几个字节", "zh": "为什么 protobuf 编码后比原始数据还多了几个字节", "en": "why is the protobuf encoding a few bytes bigger than the raw data"}
+{"id": "fn-hunter:simple-overreach:转成十进制", "zh": "浮点数转成十进制字符串为什么会丢精度", "en": "why does converting a float to a decimal string lose precision"}
+{"id": "fn-hunter:simple-overreach:归类为", "zh": "为什么内核把这块内存归类为 cache 而不是 used", "en": "why does the kernel classify this memory as cache rather than used"}
+{"id": "fn-hunter:simple-overreach:分类成", "zh": "模型为什么老把这类样本分类成负例", "en": "why does the model keep classifying these samples as negatives"}
+{"id": "fn-hunter:simple-overreach:哪个git命令", "zh": "rebase 之后提交丢了，哪个 git 命令能找回来，为什么", "en": "after a rebase my commits are gone; which git command gets them back, and why"}
+{"id": "fn-hunter:code:全角括号", "zh": "handler 里调了 ctx.Done（），但取消信号一直收不到", "en": "handler calls ctx.Done() but the cancel signal never arrives"}
+{"id": "fn-hunter:code:全角括号", "zh": "在 init（） 里起后台任务会有啥坑", "en": "what are the pitfalls of starting a background task inside init()"}
+{"id": "fn-hunter:rootcause:根子", "zh": "这个问题根子到底在哪", "en": "what's the root cause of this problem"}
+{"id": "fn-hunter:rootcause:根本上", "zh": "别只重启，根本上是啥问题要搞清楚", "en": "don't just restart it, we need to find the root cause"}
+{"id": "fn-hunter:occur:什么时候出现", "zh": "这个竞态一般在什么时候出现", "en": "when does this race condition usually occur"}
+{"id": "fn-hunter:occur:什么情况下出现", "zh": "什么情况下出现脏读", "en": "under what conditions do dirty reads occur"}
+{"id": "fn-hunter:vulnerable:注入风险", "zh": "这个查询有没有被注入的风险", "en": "is this query vulnerable to injection"}
+{"id": "fn-hunter:vulnerable:能被XSS", "zh": "这个富文本渲染能被 XSS 吗", "en": "is this rich-text rendering vulnerable to XSS"}
+{"id": "fn-hunter:why-guard:怎么会写", "zh": "怎么会写出这种死循环，条件明明会变", "en": "why would this end up as an infinite loop? the condition clearly changes"}
+{"id": "fn-hunter:why:凭啥", "zh": "凭啥这个分区的 leader 一直不切", "en": "why won't this partition's leader fail over"}
+{"id": "fn-hunter:explain:给我讲下", "zh": "给我讲下 JVM 的逃逸分析到底干了啥", "en": "explain what the JVM's escape analysis actually does"}
+{"id": "fn-hunter:explain:唠唠 control:讲讲", "zh": "讲讲 Go 调度器的 work stealing", "en": "explain work stealing in the Go scheduler"}
+{"id": "fn-hunter:derive:推下", "zh": "推下这个递推式的通项", "en": "derive the closed form of this recurrence"}
+{"id": "fn-hunter:prove:证下", "zh": "证下这个 bitmap 算法不会漏判", "en": "prove this bitmap algorithm never misses a match"}
+{"id": "fn-hunter:length", "zh": "昨晚十点左右订单服务开始大量超时，看监控数据库连接数打满了，CPU 和内存都正常，慢查询日志里也没看到特别慢的 SQL，重启之后就恢复了，但是今天早上又来了一次，大概持续了十分钟，大家有啥思路吗", "en": "Around ten last night the order service started timing out heavily. Monitoring showed the database connection pool was maxed out, CPU and memory were normal, and there was nothing especially slow in the slow query log. A restart fixed it, but it happened again this morning for about ten minutes. Any ideas?"}
+{"id": "fn-hunter:length", "zh": "我们有个服务是 go 写的，线上跑了一段时间之后 RSS 会慢慢涨到 4G 左右然后被 k8s 干掉，pprof 看 heap 只有几百兆，怀疑是 cgo 那边或者是内存碎片的问题，但不知道从哪下手查", "en": "We have a service written in Go. After running in production for a while its RSS slowly climbs to around 4G and then k8s kills it. pprof shows the heap is only a few hundred MB. I suspect cgo or memory fragmentation, but I don't know where to start investigating."}
+{"id": "fn-hunter:length", "zh": "灰度发布到百分之十的时候支付回调成功率从九十九点九掉到了九十七，回滚之后恢复，对比了两个版本的代码只改了日志格式和一个超时配置，从三秒改成了一秒，下游的平均响应也就几百毫秒，想不通为啥影响这么大", "en": "When the canary reached ten percent, the payment callback success rate dropped from 99.9 to 97, and it recovered after we rolled back. Comparing the two versions, the only changes were the log format and one timeout setting, from three seconds to one second. Downstream average response is only a few hundred milliseconds, so I can't figure out why the impact is so large."}
+{"id": "fn-hunter:why:怎么这么 realistic", "zh": "线上两个服务互相调用，偶尔整条链路卡住十几秒，jstack 看两边线程都在 WAITING，怎么这么诡异", "en": "two services call each other in prod and occasionally the whole chain hangs for over ten seconds; jstack shows threads on both sides in WAITING. why is this happening"}
+{"id": "fn-hunter:explain:说下 realistic", "zh": "说下 LSM tree 的写放大和读放大是怎么来的，compaction 策略怎么影响这两个", "en": "explain where write amplification and read amplification come from in an LSM tree, and how the compaction strategy affects each"}
+{"id": "fn-hunter:step:分步算 realistic", "zh": "分步算下三个节点挂一个的时候，这个 Paxos 实现提交一次要几轮 RTT", "en": "work out step by step how many RTTs this Paxos implementation needs to commit once when one of three nodes is down"}
+{"id": "fn-hunter:trace:跟一下 realistic", "zh": "跟一下这段代码，i 和 j 每一轮之后分别是多少", "en": "trace this code: what are i and j after each round"}
+{"id": "fn-hunter:why:咋就 realistic", "zh": "这段 rust 代码借用检查器咋就不让过，明明生命周期是对的", "en": "why won't the borrow checker accept this Rust code? the lifetimes are clearly correct"}
+{"id": "fn-hunter:why:咋老 realistic", "zh": "Kafka 消费者组 rebalance 的时候咋老重复消费", "en": "why does the Kafka consumer group keep consuming duplicates during a rebalance"}
+{"id": "fn-hunter:explain:说说 realistic", "zh": "说说分布式锁用 Redis 和用 ZK 各自的坑，续期那块怎么处理", "en": "explain the pitfalls of distributed locks on Redis versus ZooKeeper, and how to handle lease renewal"}
+{"id": "fn-hunter:prove:证一下 realistic", "zh": "这个无锁队列在 ABA 场景下会不会出问题，证一下", "en": "can this lock-free queue break under the ABA problem? prove it"}
+{"id": "fn-hunter:theoretical:理论延迟", "zh": "按光速算，北京到上海的理论延迟是多少，实际 ping 为啥差这么多", "en": "at the speed of light, what's the theoretical latency from Beijing to Shanghai"}
+{"id": "fn-hunter:start:从X算起", "zh": "从 0 算起，第 k 次调用之后 LRU 里剩哪几个 key", "en": "starting from 0, which keys are left in the LRU after the k-th call"}
+{"id": "fn-hunter:why:咋回事", "zh": "同一个事务里两次读结果不一样是咋回事，隔离级别是 RC", "en": "why do two reads in the same transaction return different results? the isolation level is RC"}
+{"id": "fn-hunter:why-guard:操作为啥", "zh": "这个 rename 操作为啥不是原子的", "en": "why isn't this rename operation atomic"}
+{"id": "fn-hunter:why-guard:工作为啥", "zh": "异步任务的工作线程池为啥一直是满的，队列也在堆积", "en": "why is the async task worker thread pool always full, with the queue backing up too"}
+{"id": "fn-hunter:final:最后", "zh": "三个协程并发往 map 里写，跑完之后 len 最后是几", "en": "three coroutines write to a map concurrently; what's the final value of len after it finishes"}
+{"id": "fn-hunter:tradeoff:折中 realistic", "zh": "副本数多了写延迟高，少了怕丢数据，这个怎么折中", "en": "more replicas means higher write latency, fewer risks data loss; how do I make that trade-off"}
+{"id": "fn-hunter:explain:讲下 realistic", "zh": "讲下 Linux 的 page cache 回写机制，dirty_ratio 和 dirty_background_ratio 是怎么配合的", "en": "explain Linux's page cache writeback, and how dirty_ratio and dirty_background_ratio work together"}
+{"id": "fn-hunter:namebug:gap>8", "zh": "指出下面这个 Go 函数里的 bug", "en": "name the bug in the Go function below"}
+{"id": "fn-hunter:namebug:gap>8 formal", "zh": "请指出这段 C 代码中可能导致内存泄漏的缺陷", "en": "name the bug in this C code that can leak memory"}
+{"id": "fn-hunter:namebug:说下", "zh": "说下这个函数的 bug 是啥", "en": "name the bug in this function"}
+{"id": "fn-hunter:namebug:说下原因", "zh": "接口时好时坏，说下原因", "en": "the endpoint works sometimes and not others; name the cause"}
+{"id": "fn-hunter:start:初始为 (from casual h01)", "zh": "x 初始为 1，每轮如果是奇数就乘 3 加 1，否则除 2，第 4 轮后是多少", "en": "start with x = 1; each round, if it's odd multiply by 3 and add 1, otherwise divide by 2. what is it after round 4"}

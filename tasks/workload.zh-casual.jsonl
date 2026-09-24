@@ -1,0 +1,36 @@
+{"id": "e01", "prompt": "帮我看下这行日志是啥级别，DEBUG、INFO、WARN、ERROR 里选一个。只回级别。\n\n2026-08-01T04:12:09Z payment-svc: failed to settle txn 8813: connection refused"}
+{"id": "e02", "prompt": "把这行 access log 里的 HTTP 状态码抠出来。只回数字。\n\n10.2.0.14 - - [01/Aug/2026:04:12:09] \"POST /v1/settle HTTP/1.1\" 503 219 \"-\" \"curl/8.4\""}
+{"id": "e03", "prompt": "文件扩展名是 .rs 的是哪个编程语言？只回语言名，小写。"}
+{"id": "e04", "prompt": "撤掉最后一个 commit，但改动要留在工作区、保持 staged，git 命令咋写？只回命令。"}
+{"id": "e05", "prompt": "把这段 JSON 里 \"retries\" 的值取出来。只回值。\n\n{\"service\": \"queue\", \"config\": {\"timeout_ms\": 300, \"retries\": 42}, \"enabled\": true}"}
+{"id": "e06", "prompt": "这个 regex ^\\d{3}-\\d{4}$ 能匹配 555-0123 吗？只回 yes 或 no。"}
+{"id": "e07", "prompt": "按 RFC 9110，HTTP 的 PUT 方法是幂等的吗？只回 yes 或 no。"}
+{"id": "e08", "prompt": "一个 mebibyte 里有多少个 kibibyte？只回数字。"}
+{"id": "e09", "prompt": "POSIX shell 里命令找不到的时候，shell 返回的 exit code 是多少？只回数字。"}
+{"id": "e10", "prompt": "下面哪个是合法的 semver 版本号：1.0.0-alpha.1, v1.0, 1.0.0.0？只回合法的那个。"}
+{"id": "e11", "prompt": "十六进制字面量 0xFF 转成十进制是多少？只回数字。"}
+{"id": "e12", "prompt": "单层循环，把 n 个元素的 list 遍历一遍，每次只做常数时间的操作，时间复杂度是啥？只回大 O 表示法。"}
+{"id": "m01", "prompt": "按 Conventional Commits 规范，这个改动该用哪个 type 前缀：'correct off-by-one in pagination offset so the last page renders'？只回 type，不要带冒号。"}
+{"id": "m02", "prompt": "有张表 orders(id, customer_id, total_cents, created_at)，写个 SQL 查出每个 customer_id 和它的订单数。只回 SQL。"}
+{"id": "m03", "prompt": "一个 Python 服务报错：KeyError: 'user_id'，出错那行是 `uid = payload['user_id']`。根因是啥？五个词以内。"}
+{"id": "m04", "prompt": "说下这个 Python 函数的 bug 是啥，五个词以内。\n\ndef add(item, bucket=[]):\n    bucket.append(item)\n    return bucket"}
+{"id": "m05", "prompt": "客户端 PUT 一个资源，但资源的 version 和服务端当前的 version 对不上，服务端拒绝了。该返回哪个 HTTP 状态码？只回数字。"}
+{"id": "m06", "prompt": "写个 cron 表达式，'每周一 03:00' 跑。只回五个字段的表达式。"}
+{"id": "m07", "prompt": "Dockerfile 里 `COPY . /app` 写在 `RUN pip install -r requirements.txt` 前面。为啥这样 rebuild 很慢？不到十个词说下。"}
+{"id": "m08", "prompt": "两个 goroutine 对同一个 int 变量做自增，没加 mutex 也没用 atomic。这算 data race 吗？只回 yes 或 no。"}
+{"id": "m09", "prompt": "这个 Python 表达式结果是多少？只回数字。\n\nlen([x for x in range(10) if x % 3 != 0])"}
+{"id": "m10", "prompt": "查询 `SELECT * FROM events WHERE created_at > $1 ORDER BY created_at LIMIT 100` 在一张 50M 行的表上走了全表扫描。哪一列要加索引？只回列名。"}
+{"id": "m11", "prompt": "这说的是哪个设计模式：一个类只允许有一个实例，并对外暴露一个全局访问入口。只回模式名。"}
+{"id": "m12", "prompt": "Python 里 `len({1, 2, 2, 3, 3, 3})` 的值是多少？只回数字。"}
+{"id": "h01", "prompt": "x 初始为 1。重复 4 次：x 是奇数就令 x = 3x + 1，否则令 x = x / 2。最后 x 是多少？只回数字。"}
+{"id": "h02", "prompt": "两层嵌套循环，都是遍历 n 个元素，但内层循环每次第一轮就 `break` 了。时间复杂度的 tight bound 是多少？只回大 O 表示法。"}
+{"id": "h03", "prompt": "线程 A 先锁 mutex X 再锁 mutex Y，线程 B 先锁 mutex Y 再锁 mutex X。两个并发跑，没有超时。有可能死锁吗？只回 yes 或 no。"}
+{"id": "h04", "prompt": "Python 里 `fns = [lambda: i for i in range(3)]`，然后 `[f() for f in fns]` 返回的是 [2, 2, 2] 而不是 [0, 1, 2]。为啥？五个词以内说下原因。"}
+{"id": "h05", "prompt": "用户改了个人资料，请求被路由到一个还没同步上的 replica，看到的还是旧值。这违反了哪种一致性保证？只回保证的名字。"}
+{"id": "h06", "prompt": "IEEE-754 双精度下，0.1 + 0.2 == 0.3 结果是 true 吗？只回 yes 或 no。"}
+{"id": "h07", "prompt": "在一个 1,000,000 个元素的有序数组上做二分查找，最坏情况下最多比较几次？只回数字。"}
+{"id": "h08", "prompt": "递归函数 f(n)：n <= 1 时返回 1，否则返回 n * f(n - 1)。f(5) 是多少？只回数字。"}
+{"id": "h09", "prompt": "`git checkout <sha>` 到一个不在任何分支上的 commit，这时候 HEAD 是啥状态？两个词以内回答。"}
+{"id": "h10", "prompt": "一个数组每一步减半，直到只剩一个元素。从 256 个元素开始，一共要减半几步？只回数字。"}
+{"id": "h11", "prompt": "任何基于比较的排序算法，最坏情况时间的 tight lower bound 是多少？只回大 O 表示法。"}
+{"id": "h12", "prompt": "一个缓存能放 3 个条目，LRU 淘汰。访问序列：A B C A D B。一共 cache miss 几次？只回数字。"}
